@@ -1,0 +1,864 @@
+
+Welcome to the Wonderful Movie Theater program!
+	Tonight's feature are:
+		"Life" and "Logan"
+
+Please specifiy the size of the Movie Theaters:
+Enter information about the Logan Movie Theater:
+		>> Enter number of rows: 0
+
+	Number must be greater than zero!
+
+		>> Enter number of rows: two
+
+	Input must be a number!
+
+		>> Enter number of rows: 1
+		>> Enter number of seats in a row: 2
+Enter information about the Life Movie Theater:
+		>> Enter number of rows: 6
+		>> Enter number of seats in a row: 3
+	>> Enter the price of a ticket: no
+
+	Input must be a number!
+
+	>> Enter the price of a ticket: -13
+
+	Number must be greater than zero!
+
+	>> Enter the price of a ticket: 0
+
+	Number must be greater than zero!
+
+	>> Enter the price of a ticket: 12.99
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: hello
+
+I'm sorry. I don't understand hello
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Mario
+	>> Enter party size: 3
+	>> Enter movie name: harry potter
+
+	That is not a valid answer!
+
+	>> Enter movie name: life
+
+	That is not a valid answer!
+
+	>> Enter movie name: Life
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Mario is in first ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 4
+
+The following customer is in the first line:
+	Customer Mario party of 3 for Life movie. 
+No customers in the second line!
+No customers in the express line!
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 is free.
+Row 1 seat 2 is free.
+Row 1 seat 3 is free.
+Row 2 seat 1 is free.
+Row 2 seat 2 is free.
+Row 2 seat 3 is free.
+Row 3 seat 1 is free.
+Row 3 seat 2 is free.
+Row 3 seat 3 is free.
+Row 4 seat 1 is free.
+Row 4 seat 2 is free.
+Row 4 seat 3 is free.
+Row 5 seat 1 is free.
+Row 5 seat 2 is free.
+Row 5 seat 3 is free.
+Row 6 seat 1 is free.
+Row 6 seat 2 is free.
+Row 6 seat 3 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 6
+
+Here's the seating chart for the Logan Movie Theater:
+
+Row 1 seat 1 is free.
+Row 1 seat 2 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Which line would you like to serve customers first? (Express/Reg1/Reg2): 1
+
+	That is not a valid answer!
+
+Which line would you like to serve customers first? (Express/Reg1/Reg2): Express
+
+Serving customer Mario...
+
+Mario, party of 3, has been seated in the Life Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Mario's party.
+Row 1 seat 2 used by Mario's party.
+Row 1 seat 3 used by Mario's party.
+Row 2 seat 1 is free.
+Row 2 seat 2 is free.
+Row 2 seat 3 is free.
+Row 3 seat 1 is free.
+Row 3 seat 2 is free.
+Row 3 seat 3 is free.
+Row 4 seat 1 is free.
+Row 4 seat 2 is free.
+Row 4 seat 3 is free.
+Row 5 seat 1 is free.
+Row 5 seat 2 is free.
+Row 5 seat 3 is free.
+Row 6 seat 1 is free.
+Row 6 seat 2 is free.
+Row 6 seat 3 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Bowser
+	>> Enter party size: 1
+	>> Enter movie name: Life
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Bowser is in first ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Bowser...
+
+Bowser, party of 1, has been seated in the Life Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Mario's party.
+Row 1 seat 2 used by Mario's party.
+Row 1 seat 3 used by Mario's party.
+Row 2 seat 1 used by Bowser's party.
+Row 2 seat 2 is free.
+Row 2 seat 3 is free.
+Row 3 seat 1 is free.
+Row 3 seat 2 is free.
+Row 3 seat 3 is free.
+Row 4 seat 1 is free.
+Row 4 seat 2 is free.
+Row 4 seat 3 is free.
+Row 5 seat 1 is free.
+Row 5 seat 2 is free.
+Row 5 seat 3 is free.
+Row 6 seat 1 is free.
+Row 6 seat 2 is free.
+Row 6 seat 3 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Bowser
+Customer Bowser is already in the theater!
+	>> Enter customer name: Pikachu
+	>> Enter party size: 3
+	>> Enter movie name: Life
+	>> Is a child 11 or younger in this party? (Y/N): Y
+
+Customer Pikachu is in express ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Pikachu...
+
+Pikachu, party of 3, has been seated in the Life Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Mario's party.
+Row 1 seat 2 used by Mario's party.
+Row 1 seat 3 used by Mario's party.
+Row 2 seat 1 used by Bowser's party.
+Row 2 seat 2 used by Pikachu's party.
+Row 2 seat 3 used by Pikachu's party.
+Row 3 seat 1 used by Pikachu's party.
+Row 3 seat 2 is free.
+Row 3 seat 3 is free.
+Row 4 seat 1 is free.
+Row 4 seat 2 is free.
+Row 4 seat 3 is free.
+Row 5 seat 1 is free.
+Row 5 seat 2 is free.
+Row 5 seat 3 is free.
+Row 6 seat 1 is free.
+Row 6 seat 2 is free.
+Row 6 seat 3 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Mewtwo
+	>> Enter party size: 2
+	>> Enter movie name: Life
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Mewtwo is in first ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Mewtwo...
+
+Mewtwo, party of 2, has been seated in the Life Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Mario's party.
+Row 1 seat 2 used by Mario's party.
+Row 1 seat 3 used by Mario's party.
+Row 2 seat 1 used by Bowser's party.
+Row 2 seat 2 used by Pikachu's party.
+Row 2 seat 3 used by Pikachu's party.
+Row 3 seat 1 used by Pikachu's party.
+Row 3 seat 2 used by Mewtwo's party.
+Row 3 seat 3 used by Mewtwo's party.
+Row 4 seat 1 is free.
+Row 4 seat 2 is free.
+Row 4 seat 3 is free.
+Row 5 seat 1 is free.
+Row 5 seat 2 is free.
+Row 5 seat 3 is free.
+Row 6 seat 1 is free.
+Row 6 seat 2 is free.
+Row 6 seat 3 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Luigi
+	>> Enter party size: 1
+	>> Enter movie name: Logan
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Luigi is in first ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Kirby
+	>> Enter party size: 1
+	>> Enter movie name: Logan
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Kirby is in second ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 4
+
+The following customer is in the first line:
+	Customer Luigi party of 1 for Logan movie. 
+The following customer is in the second line:
+	Customer Kirby party of 1 for Logan movie. 
+No customers in the express line!
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Kirby...
+
+Kirby, party of 1, has been seated in the Logan Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Mario's party.
+Row 1 seat 2 used by Mario's party.
+Row 1 seat 3 used by Mario's party.
+Row 2 seat 1 used by Bowser's party.
+Row 2 seat 2 used by Pikachu's party.
+Row 2 seat 3 used by Pikachu's party.
+Row 3 seat 1 used by Pikachu's party.
+Row 3 seat 2 used by Mewtwo's party.
+Row 3 seat 3 used by Mewtwo's party.
+Row 4 seat 1 is free.
+Row 4 seat 2 is free.
+Row 4 seat 3 is free.
+Row 5 seat 1 is free.
+Row 5 seat 2 is free.
+Row 5 seat 3 is free.
+Row 6 seat 1 is free.
+Row 6 seat 2 is free.
+Row 6 seat 3 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 6
+
+Here's the seating chart for the Logan Movie Theater:
+
+Row 1 seat 1 used by Kirby's party.
+Row 1 seat 2 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Luigi...
+
+Luigi, party of 1, has been seated in the Logan Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 6
+
+Here's the seating chart for the Logan Movie Theater:
+
+Row 1 seat 1 used by Kirby's party.
+Row 1 seat 2 used by Luigi's party.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 3
+
+	>> Enter customer name to leave Movie Theater: Kirby
+
+Customer Kirby has left the Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 6
+
+Here's the seating chart for the Logan Movie Theater:
+
+Row 1 seat 1 is free.
+Row 1 seat 2 used by Luigi's party.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Kirby
+	>> Enter party size: 1
+	>> Enter movie name: Logan
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Kirby is in first ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 4
+
+The following customer is in the first line:
+	Customer Kirby party of 1 for Logan movie. 
+No customers in the second line!
+No customers in the express line!
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Kirby...
+
+Kirby, party of 1, has been seated in the Logan Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 6
+
+Here's the seating chart for the Logan Movie Theater:
+
+Row 1 seat 1 used by Kirby's party.
+Row 1 seat 2 used by Luigi's party.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Mario's party.
+Row 1 seat 2 used by Mario's party.
+Row 1 seat 3 used by Mario's party.
+Row 2 seat 1 used by Bowser's party.
+Row 2 seat 2 used by Pikachu's party.
+Row 2 seat 3 used by Pikachu's party.
+Row 3 seat 1 used by Pikachu's party.
+Row 3 seat 2 used by Mewtwo's party.
+Row 3 seat 3 used by Mewtwo's party.
+Row 4 seat 1 is free.
+Row 4 seat 2 is free.
+Row 4 seat 3 is free.
+Row 5 seat 1 is free.
+Row 5 seat 2 is free.
+Row 5 seat 3 is free.
+Row 6 seat 1 is free.
+Row 6 seat 2 is free.
+Row 6 seat 3 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 
+
+I'm sorry. I don't understand 
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Charizard
+	>> Enter party size: 6
+	>> Enter movie name: Life
+	>> Is a child 11 or younger in this party? (Y/N): Y
+
+Customer Charizard is in express ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Charizard...
+
+Charizard, party of 6, has been seated in the Life Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Mario's party.
+Row 1 seat 2 used by Mario's party.
+Row 1 seat 3 used by Mario's party.
+Row 2 seat 1 used by Bowser's party.
+Row 2 seat 2 used by Pikachu's party.
+Row 2 seat 3 used by Pikachu's party.
+Row 3 seat 1 used by Pikachu's party.
+Row 3 seat 2 used by Mewtwo's party.
+Row 3 seat 3 used by Mewtwo's party.
+Row 4 seat 1 used by Charizard's party.
+Row 4 seat 2 used by Charizard's party.
+Row 4 seat 3 used by Charizard's party.
+Row 5 seat 1 used by Charizard's party.
+Row 5 seat 2 used by Charizard's party.
+Row 5 seat 3 used by Charizard's party.
+Row 6 seat 1 is free.
+Row 6 seat 2 is free.
+Row 6 seat 3 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 3
+
+	>> Enter customer name to leave Movie Theater: Mario
+
+Customer Mario has left the Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 is free.
+Row 1 seat 2 is free.
+Row 1 seat 3 is free.
+Row 2 seat 1 used by Bowser's party.
+Row 2 seat 2 used by Pikachu's party.
+Row 2 seat 3 used by Pikachu's party.
+Row 3 seat 1 used by Pikachu's party.
+Row 3 seat 2 used by Mewtwo's party.
+Row 3 seat 3 used by Mewtwo's party.
+Row 4 seat 1 used by Charizard's party.
+Row 4 seat 2 used by Charizard's party.
+Row 4 seat 3 used by Charizard's party.
+Row 5 seat 1 used by Charizard's party.
+Row 5 seat 2 used by Charizard's party.
+Row 5 seat 3 used by Charizard's party.
+Row 6 seat 1 is free.
+Row 6 seat 2 is free.
+Row 6 seat 3 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Mario
+	>> Enter party size: 6
+	>> Enter movie name: Life
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Mario is in first ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Mario...
+
+Mario, party of 6, has been seated in the Life Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Mario's party.
+Row 1 seat 2 used by Mario's party.
+Row 1 seat 3 used by Mario's party.
+Row 2 seat 1 used by Bowser's party.
+Row 2 seat 2 used by Pikachu's party.
+Row 2 seat 3 used by Pikachu's party.
+Row 3 seat 1 used by Pikachu's party.
+Row 3 seat 2 used by Mewtwo's party.
+Row 3 seat 3 used by Mewtwo's party.
+Row 4 seat 1 used by Charizard's party.
+Row 4 seat 2 used by Charizard's party.
+Row 4 seat 3 used by Charizard's party.
+Row 5 seat 1 used by Charizard's party.
+Row 5 seat 2 used by Charizard's party.
+Row 5 seat 3 used by Charizard's party.
+Row 6 seat 1 used by Mario's party.
+Row 6 seat 2 used by Mario's party.
+Row 6 seat 3 used by Mario's party.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 8
+The Wonderful Movie Theater, who earned $311.76, kicks out remaining customers and closes...
+Good Bye!

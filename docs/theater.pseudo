@@ -1,0 +1,78 @@
+"Wonderful Movie Theater Program"
+
+master list of customers 
+    ∙ organized by customer name
+lines for customers entering movie theater
+    ∙ express line
+    ∙ 2 regular lines
+
+for each new customer
+    enter name
+    while name exists in master list
+        force customer to choose new name
+    enter partySize, hasChild, movie name
+    add customer to master list
+    if customer has a child
+        place customer in shortest overall line
+    else
+        place customer in shortest regular line
+
+for each customer in line:
+    dequeue next customer
+    if customer's movie is sold out:
+        if alternate movie is sold out:
+            remove customer from master list
+        else
+            suggest alternate movie
+            if customer refuses alternate:
+                remove customer from master list
+    else
+        add customer to their movie's auditorium
+    // customer stays in their seat until they are manually removed
+    // they may stay there for the rest of the program's runtime
+
+removing a customer from auditorium:
+    collect name input
+    if name exists:
+        remove from master list
+        get customer's movie name
+        remove them from that auditorium
+    else
+        print "That name does not exist!"
+
+// Seat positions range from 1 to the capacity of auditorium
+finding an empty seat given a list of occupied seats:
+    if list is empty
+        sit in seat 1
+    else
+        get position of first occupied seat
+        if position > 1
+            sit in seat 1
+        else
+            for each seat in list minus the last one
+                get position of this seat
+                get position of next occupied seat
+                if next position - this position > 1
+                    sit in seat (this position + 1)
+                    // index of chosen seat is same as index of next seat
+            if stil no
+
+                    
+
+========
+Analysis
+========
+
+For n many customers:
+
+Critical Operation(s):
+    ∙ checking if input name exists
+        → Best Case: 
+            - no customers decide to leave
+            - name always valid on first try
+            >> n checks
+        → Worst Case:
+            - every customer leaves
+            >> 2n checks
+            - given names are already taken
+            >> anywhere from n + 1 to ∞ checks

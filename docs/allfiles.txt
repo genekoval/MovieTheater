@@ -1,0 +1,4139 @@
+/**
+ * A resizable-array implementation of the ListInterface.
+ * 
+ * @author Eugene Koval
+ * @version 2017.04.21
+ *
+ * @param <T> the type of items held in this collection
+ */
+public class ArrayBasedList<T> implements ListInterface<T> {
+
+    /** The array containing this list's items. */
+    protected T[] items;
+    /** The total number of items in this list. */
+    protected int numItems;
+
+    /**
+     * Constructs an empty list with an initial capacity of three.
+     */
+    public ArrayBasedList() {
+        items = (T[]) new Object[3];
+        numItems = 0;
+    }
+
+    /** 
+     * Returns true if this list contains no items.
+     *
+     * @return true if this list contains no items.
+     */
+    public boolean isEmpty() {
+        return numItems == 0;
+    }
+
+    /**
+     * Returns the total number of items in this list.
+     *
+     * @return the total number of items.
+     */
+    public int size() {
+        return numItems;
+    }
+    
+    /**
+     * Returns the item at the specified position in this list.
+     *
+     * @param index index of the item to return
+     * @return the item at the specified positino in this list
+     */
+    public T get(int index) {
+        if (index >= 0 && index < numItems) 
+            return items[index];
+        else
+            throw new ListIndexOutOfBoundsException(
+                "List index " + index + " out of bounds on get.");
+    }
+
+    /**
+     * Inserts the specified item at the specified position in this list.
+     * Shifts the item currently at that position (if any) and any 
+     * subsequent items to the right.
+     *
+     * @param index index at which the specified item is to be inserted
+     * @param item item to be inserted
+     */
+    public void add(int index, T item) {
+        if (index >= 0 && index <= numItems) {
+            if (numItems == items.length)
+                resize();
+            for (int pos = numItems - 1; pos >= index; pos--) 
+                items[pos + 1] = items[pos];
+            items[index] = item;
+            numItems++;
+        }
+        else
+            throw new ListIndexOutOfBoundsException(
+               "List index " + index + " out of bounds on add.");
+    }
+    
+    /**
+     * Removes the item at the specified position in this list.
+     * Shifts any subsequent items to the left.
+     *
+     * @param index the index of the item to be removed
+     */
+    public T remove(int index) {
+        if (index >= 0 && index < numItems) {
+            T item = items[index];
+            for (int pos = index + 1; pos < numItems; pos++)
+                items[pos - 1] = items[pos];
+            items[numItems - 1] = null;
+            numItems--;
+            return item;
+        }
+        else
+            throw new ListIndexOutOfBoundsException(
+                "List index " + index + " out of bonds on remove.");
+    }
+
+    /**
+     * Removes all of the items from this list.
+     * The list will be empty after this call returns.
+     * The list's capacity will return to the initial size of three.
+     */
+    public void removeAll() {
+        items = (T[]) new Object[3];
+        numItems = 0;
+    }
+
+    /** 
+     * Returns the String representation of this list.
+     * The returned String will include the String representation of all of 
+     * this list's item.
+     *
+     * @return the String representation of this list
+     */
+    @Override
+    public String toString() {
+        String listString = "";
+        for (int i = 0; i < numItems; i++)
+            listString += items[i].toString() + '\n';
+        return listString;
+    }
+    
+    /**
+     * Resizes this list to make room for additional items.
+     * The list's sie is increased by a factor of 1.5.
+     */
+    private void resize() {
+        T[] resizedItems = (T[]) new Object[(items.length * 3) / 2 + 1];
+        for (int i = 0; i < numItems; i++)
+            resizedItems[i] = items[i];
+        items = resizedItems;
+    }
+}
+/**
+ * A sorted list with all of its elements in ascending order.
+ * The items in this list are ordered based on their search keys.
+ * An ArrayBasedList is used to hold all of the items in this collection.
+ * Items can retrieved and removed using their search keys or by index.
+ * Adding items can only be done based on their search keys. This ensures
+ * all items are always in sorted order.
+ *
+ * @author Eugene Koval
+ * @version 2017.04.22
+ *
+ * @param <T> the type of items held in this collection
+ * @param <KT> the type of each item's search key
+ */
+public class AscendinglyOrderedList<T extends KeyedItem<KT>, 
+KT extends Comparable<? super KT>> {
+   
+    /* The list containing this list's items. */
+    private ArrayBasedList<T> items;
+    
+    /**
+     * Constructs an empty Ascendingly-Ordered List.
+     */
+    public AscendinglyOrderedList() {
+        items = new ArrayBasedList<T>();
+    }
+
+    /**
+     * Returns true if this list contains no items.
+     *
+     * @return true if this list contains no items.
+     */
+    public boolean isEmpty() {
+        return items.isEmpty();
+    }
+
+    /**
+     * Returns the total number of items in this list.
+     *
+     * @return the total number of items.
+     */
+    public int size() {
+        return items.size();
+    }
+
+    /**
+     * Returns the index of the item with a search key that matches the 
+     * specified search key. If no item matching the search key is found,
+     * the index where the item would go is returned in an encoded manner.
+     * To decode the index of failed search, multiply it by -1 and add 1.
+     *
+     * @param searchKey the search key to search for
+     * @return index of the found item or encoded index of where the item would go
+     */
+    public int indexOf(KT searchKey) {
+        int result = 0;
+        int low = 0;
+        int high = items.size() - 1;
+        while (low < high) {
+            int mid = (low + high) / 2;
+            if (items.get(mid).getKey().compareTo(searchKey) < 0)
+                low = mid + 1;
+            else
+                high = mid;
+        }
+        if (high >= 0 && items.get(low).getKey().equals(searchKey))
+            result = low;
+        else // Encode failed search result.
+            result = (low + 1) * -1;
+        return result;
+    }
+
+    /**
+     * Returns true if an item with a search key matching the specified search
+     * key is in this list.
+     *
+     * @param searchKey the search key to search for
+     * @return true if the item searched for is in this list
+     */
+    public boolean contains(KT searchKey) {
+        return indexOf(searchKey) >= 0;
+    }
+
+    /**
+     * Returns the item at the specified position in this list.
+     *
+     * @param index index of the item to return
+     * @return the item at the specified position in this list.
+     */
+    public T get(int index) {
+        return items.get(index);
+    }
+
+    /**
+     * Returns the item with a search key equal to the specified one.
+     *
+     * @param searchKey the search key to search for
+     * @return the item matching the specified search key
+     */
+    public T get(KT searchKey) {
+        int index = indexOf(searchKey);
+        if (index >= 0)
+            return items.get(index);
+        else
+            throw new ListException("Item not found in list.");
+    }
+    
+    /**
+     * Inserts the specified item into the proper position in the list.
+     * After this call, the new item will be in the list with the list retaining
+     * its sorted fashion.
+     *
+     * @param newItem item to be inserted
+     */
+    public void add(T newItem) {
+        int numItems = items.size();
+        KT searchKey = newItem.getKey();
+        if (numItems == 0 || searchKey.compareTo(items.get(0).getKey()) < 0)
+            items.add(0, newItem);
+        else if (searchKey.compareTo(items.get(numItems - 1).getKey()) > 0)
+            items.add(numItems, newItem);
+        else {
+            int target = indexOf(searchKey);
+            if (target < 0)
+                target = (target * -1) - 1;
+            items.add(target, newItem);
+        }
+    }
+   
+    /**
+     * Returns and removes the item at the specified index.
+     *
+     * @param index the index of the item to be removed
+     * @return the removed item
+     */
+    public T remove(int index) {
+        return items.remove(index);
+    }
+
+    /**
+     * Returns and removes the item with the search key matching the specified
+     * one. If the item is not found, a ListException is thrown.
+     *
+     * @param searchKey the search key to search for
+     * @return the removed item
+     */
+    public T remove(KT searchKey) {
+        int target = indexOf(searchKey);
+        if (target >= 0)
+            return items.remove(target);
+        else
+            throw new ListException("Item not found in list.");
+    }
+    
+    /**
+     * Removes all items in this list.
+     * After this call, the list will be empty.
+     */
+    public void removeAll() {
+        items.removeAll();
+    }
+
+    /**
+     * Returns a String representation of this list.
+     *
+     * @return a String representation of this list
+     */
+    @Override
+    public String toString() {
+        return items.toString();
+    }
+}
+/**
+ * The Auditorium class represents a room in a movie theater that plays movies.
+ * <p>
+ * An Auditorium keeps track of the mvoies that it will show as well as the
+ * number of tickets sold for its movie.
+ * <p>
+ * Since the Auditorium is identified by the name of the movie it is playing,
+ * the movie title can be obtained by a call to the getKey() method.
+ * <p>
+ * The Auditorium's seats are arranged in a grid pattern with a given number 
+ * of rows and seats per row. 
+ * <p>
+ * The structure of an Auditorium is immutable. Seats may not be added or removed 
+ * after its initial construction. This is done so that the collection of 
+ * occupied seats is not left in an inconsistentstate. Additionally, since each 
+ * auditorium is identified by its movie title, the movie cannot be changed 
+ * either. This keeps the movie from changing while there are seat occupants
+ * watching the current movie. If an Auditorium with a different movie or 
+ * different seating structure is desired, a new Auditorium will have to be 
+ * constructed.
+ *
+ * @author Eugene Koval
+ * @version 2017.04.23
+ */
+public class Auditorium extends KeyedItem<String> {
+    
+    /* The number of tickets sold for this Auditorium's movie. */
+    private int ticketsSold = 0;
+    /* The number of rows of seats in this Auditorium. */
+    private int rows;
+    /* This auditorium's total number of seats. */
+    private int capacity;
+    /* The list of all occupied seats. */
+    private ListInterface<Seat> seats;
+
+    /** 
+     * Constructor for an Auditorium.
+     * Creates an Auditorium that plays the given movie with the given number
+     * of rows of seats and number of seats per row.
+     *
+     * @param movie the movie being played by this Auditorium.
+     * @param rows the number of rows of seats.
+     * @param seatsPerRow the number of seats per row.
+     */
+    public Auditorium(String movie, int rows, int seatsPerRow) {
+        super(movie);
+        this.rows = rows;
+        capacity = rows * seatsPerRow;
+        seats = new ArrayBasedList();
+    }
+
+    /**
+     * Returns the total number of tickets sold for this movie.
+     *
+     * @return the total number of tickets sold.
+     */
+    public int getTicketsSold() {
+        return ticketsSold;
+    }
+
+    /**
+     * Resets the number of tickets sold to zero.
+     */
+    public void resetTicketCounter() {
+        ticketsSold = 0;
+    }
+
+    /**
+     * Returns true if all seats in this auditorium are empty.
+     *
+     * @return true if all seats are empty.
+     */
+    public boolean isEmpty() {
+        return seats.size() == 0;
+    }
+
+    /**
+     * Returns the number of currently occupied seats.
+     *
+     * @return the number of occupied seats.
+     */
+    public int getNumberOfViewers() {
+        return seats.size();
+    }
+
+    /** 
+     * Returns the number of remaining empty seats.
+     *
+     * @return the number of empty seats.
+     */
+    public int getRemainingSeats() {
+        return capacity - seats.size();
+    }
+
+    /** 
+     * Returns the total number of rows of seats.
+     *
+     * @return the numebr of rows.
+     */
+    public int getNumberOfRows() {
+        return rows;
+    }
+
+    /**
+     * Returns the total number of seats in this Auditorium, empty or otherwise.
+     *
+     * @return the total number of seats.
+     */
+    public int getSeatingCapacity() {
+        return capacity;
+    }
+
+    /**
+     * Adds a viewing party to this Auditorium.
+     * The given party size must be less than or equal to the number of remaining
+     * seats. All party members will be listed under the given name.
+     *
+     * @param partyName the name of the viewing party.
+     * @param partySize the number of seats to occupy.
+     */
+    public void addParty(String partyName, int partySize) {
+        if (partySize <= (capacity - seats.size())) {
+            ticketsSold += partySize;
+            // Make sure first seat is filled.
+            if (seats.isEmpty() || seats.get(0).getPosition() > 1) {
+                seats.add(0, new Seat(1, partyName));
+                partySize--;
+            }
+            while (partySize > 0) {
+                int index = 0;
+                int position = 0;
+                int numSeats = seats.size();
+                int lastPosition = seats.get(numSeats - 1).getPosition();
+                // Check if all occupied seats are clustered together.
+                if (numSeats == lastPosition) {
+                    index = numSeats;
+                    position = numSeats + 1;
+                }
+                // Search for empty gap.
+                else {
+                    // Based on previous checks, we know there is a 
+                    // guaranteed empty seat between first and last
+                    // occupied seats. No need to check if index will
+                    // go out of bounds.
+                    boolean searching = true;
+                    while (searching) {
+                        int currentP = seats.get(index).getPosition();
+                        int nextP = seats.get(++index).getPosition();
+                        if (nextP - currentP > 1) {
+                            position = currentP + 1;
+                            searching = false;
+                        }
+                    } // end while
+                } // end else
+                seats.add(index, new Seat(position, partyName));
+                partySize--;
+            } // end while
+        }
+        else
+            throw new TheaterException(
+                "Not enough room for " + partySize + " viewers in "  +
+                getKey());
+    }
+
+    /**
+     * Removes a viewing party from this Auditorium.
+     * All viewers matching the given name will be removed.
+     * The given party size must be less than or equal to the total number of 
+     * viewers currently in this Auditorium. Care should be given in providing
+     * an accurate party size. This method makes no attempt to find more party
+     * members than is specified in the argument. Once a number of viewers equal
+     * to the given party size has been removed, removal stops. If the number of
+     * party members removed is less than the given party size, a TheaterException
+     * will be thrown. Likewise, too few party members removed will result in 
+     * some party members being left in the theater. An additional call to this
+     * method would fix such a problem.
+     *
+     * @param partyName the name of the viewers to remove.
+     * @param partySize the numebr of viewers of the party to remove.
+     */
+    public void removeParty(String partyName, int partySize) {
+        int numSeats = seats.size();
+        if (numSeats >= partySize) {
+            int index = 0;
+            while (index < numSeats && partySize > 0) 
+                if (seats.get(index).getOccupant().equals(partyName)) {
+                    seats.remove(index);
+                    partySize--;
+                    numSeats--;
+                }
+                else
+                    index++;
+            if (partySize > 0)
+                throw new TheaterException(
+                    "Some party members may not have been removed.");
+        }
+        else
+            throw new TheaterException(
+                "Party size cannot be greater than number of viewers.");
+    }
+
+    /**
+     * Removes all film viewers leaving all seats empty.
+     */
+    public void clearAllSeats() {
+        seats.removeAll();
+    }
+
+    /**
+     * Returns a formatted String representation of this Auditorium's seating.
+     * For each seat in the Auditorium, information about its location in 
+     * relation to the rows is provided. Also, information about whether the seat
+     * is free or occupied is given. Occupied seats will have the occupant's name
+     * provided.
+     *
+     * @return the String representation of the seating chart.
+     */
+    public String generateSeatingChart() {
+        String chart = "";
+        int numSeats = seats.size();
+        int lastSeat = numSeats - 1;
+        int seatsPerRow = capacity / rows;
+        int end = capacity + 1;
+        int occupied = 
+            (seats.isEmpty()) ? end : seats.get(0).getPosition();
+        for (int r = 1, index = 0, position = 1; r <= rows; r++)
+            for (int s = 1; s <= seatsPerRow; s++, position++) {
+                chart += "\nRow " + r + " seat " + s;
+                if (position < occupied)
+                    chart += " is free.";
+                else {
+                    Seat viewer = seats.get(index);
+                    chart += " used by " + viewer.getOccupant() + "'s party.";
+                    occupied = (index < lastSeat) ? 
+                        seats.get(++index).getPosition() : end;
+                }
+            }
+        return chart;
+    } 
+}
+/**
+ * The Customer class represents a theater viewing party.
+ * The party is identified by the name of a member of the party. The Customer
+ * also keeps track of the movie the party is seeing. Finally, the number of
+ * members in the viewing party is kept track of. Since Customer is a subclass
+ * of KeyedItem, the party name is acts as the identifying key. A call to
+ * getKey() will return the name of this Customer.
+ *
+ * @author Brandon Campbell
+ * @version 04.09.2017
+ */
+public class Customer extends KeyedItem<String>
+{
+    /* The name of the movie this Customer is seeing. */
+    private String movie;
+    /* The number of members in this Customer's viewing party. */
+    private int partySize;
+
+    /**
+     * Constructor for customer
+     * @param name Name of customer.
+     * @param movie Name of movie the customer is here to see.
+     * @param partySize Number of people in the customer's party.
+     */
+    public Customer(String name, String movie, int partySize)
+    {
+        super(name);
+        this.movie = movie;
+        this.partySize = partySize;
+    }
+
+    /**
+     * Returns the name of the movie this Customer is seeing.
+     *
+     * @return the name of the movie.
+     */
+    public String getMovie()
+    {
+        return movie;
+    }
+
+    /**
+     * Sets this Customer's movie to the given new movie.
+     *
+     * @param newMovie the title of the new movie.
+     */
+    public void setMovie(String newMovie)
+    {
+        movie = newMovie;
+    }
+
+    /**
+     * Returns the number of members in this Customer's viewing party.
+     *
+     * @return the size of the viewing party.
+     */
+    public int getPartySize()
+    {
+        return partySize;
+    }
+
+    /**
+     * Returns the String representation of this Customer.
+     * The String includes this Customer's name, movie, and party size.
+     *
+     * @return this Customer's String representation.
+     */
+    @Override
+    public String toString()
+    {
+        String customer = "\n\tCustomer ";
+        customer += getKey() + " party of ";
+        customer += partySize + " for ";
+        customer += movie + " movie.";
+        return customer;
+    }
+}
+/**
+ * A Keyed Item is any item that can be identified by a Comparable data field.
+ * 
+ * @author Eugene Koval
+ * @version 2017.04.21
+ */
+public abstract class KeyedItem<KT extends Comparable<? super KT>> {
+
+    /* The search key used to identify this item. */
+    private KT searchKey;
+
+    /** 
+     * Constructor for a KeyedItem.
+     * Creates a KeyedItem with a comparable search key.
+     *
+     * @param key the comparable search key.
+     */
+    public KeyedItem(KT key) {
+        searchKey = key;
+    }
+
+    /**
+     * Returns this KeyedItem's search key.
+     *
+     * @return the the search key.
+     */
+    public KT getKey() {
+        return searchKey;
+    }
+}
+/**
+ * The Line class represents a line of customers.
+ * A Line is a Queue of Customer objects that also has a name that can be used
+ * to identify it.
+ *
+ * @author Eugene Koval
+ * @version 2017.04.22
+ */
+public class Line extends Queue<Customer> {
+
+    /* The name of this Line. */
+    private String name;
+
+    /**
+     * Constructs a Line with the given name.
+     *
+     * @param name the name of this Line.
+     */
+    public Line(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Returns the name of this Line.
+     *
+     * @return the name of this line.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets this line's name to a new one.
+     *
+     * @param newName the new name of this line.
+     */
+    public void setName(String newName) {
+        name = newName;
+    }
+
+    /**
+     * Returns the String representation of this Line.
+     * If this Line is empty, a string indicating as such will be returned.
+     * If there are Customers in this Line, the Customer's String 
+     * representation will show up in the returned String.
+     * This Line's name will be used to identify it.
+     *
+     * @return this Line's String representation.
+     */
+    @Override 
+    public String toString() {
+        String lineString = "";
+        if (isEmpty())
+            lineString = "No customers in the " + name + " line!";
+        else {
+            lineString = "The following " 
+                + ((numItems == 1) ? "customer" : "customer")
+                + " is in the " + name + " line:";
+            lineString += super.toString();
+        }
+        return lineString;
+    }
+}
+/**
+ * A resizable-array implementation of the QueueInterface.
+ * The elements in a queue are processed in a FIFO (first-in-first-out) manner.
+ * New elements are added to the back of a queue. Elements can only be removed
+ * from the front of a queue. 
+ * 
+ * @author Brandon Campbell
+ * @author Eugene Koval
+ * @version 2017.04.22
+ *
+ * @param <T> the type of elements held in this collection
+ */
+public class Queue<T> implements QueueInterface<T> {
+
+    /** The array of items in this queue. */
+    protected T[] items;
+    /** The index of the first item. */
+    protected int front = 0;
+    /** The index of the last item. */
+    protected int back = 0;
+    /** The total number of items in this queue. */
+    protected int numItems = 0;
+
+    /**
+     * Constructs an empty queue.
+     * The underlying array has the initial size of 3.
+     */
+    public Queue() {
+        items = (T[]) new Object[3];
+    }
+
+    /**
+     * Returns true if there are no items in this queue.
+     *
+     * @return true if there are no elements 
+     */
+    public boolean isEmpty() {
+        return numItems == 0;
+    }
+
+    /**
+     * Returns the total number of items in this queue.
+     *
+     * @return the total number of items.
+     */
+    public int size() {
+        return numItems;
+    }
+
+    /**
+     * Inserts the specified item into this queue.
+     *
+     * @param newItem the item to add
+     */
+    public void enqueue(T newItem) {
+        if (numItems == items.length)
+            resize();
+        items[back] = newItem;
+        back = (back + 1) % items.length;
+        numItems++;
+    }
+
+    /**
+     * Retrieves and removes the first item in this queue.
+     * 
+     * @return the removed item
+     */
+    public T dequeue() {
+        if (! (numItems == 0)) {
+            T item = items[front];
+            items[front] = null;
+            front = (front + 1) % items.length;
+            numItems--;
+            return item;
+        }
+        else
+            throw new QueueException("Queue is empty. Nothing to dequeue.");
+    }
+
+    /**
+     * Removes all items from this queue.
+     * The underlying array returns to initial size of 3.
+     */
+    public void dequeueAll() {
+        items = (T[]) new Object[3];
+        front = 0;
+        back = 0;
+        numItems = 0;
+    }
+
+    /**
+     * Retrieves, but does not remove, the first item in this queue. 
+     * Throws a QueueException if this queue is empty.
+     *
+     * @return the first item in this queue
+     */
+    public T peek() {
+        if (! (numItems == 0))
+            return items[front];
+        else
+            throw new QueueException("Queue is empty. Nothing to peek.");
+    }
+
+    /**
+     * Returns the String representation of this queue.
+     * The returned String will contain the String representation of all of 
+     * this queue's items.
+     *
+     * @return this queue's String representation.
+     */
+    @Override
+    public String toString() {
+        String queueString = "";
+        for (int i = 0; i < numItems; i++)
+            queueString += items[(front + i) % items.length].toString() + ' ';
+        return queueString;
+    }
+
+    /**
+     * Resizes this queue's array to make room for additional items.
+     * The current array's size is increased by a factor of 1.5.
+     */
+    private void resize() {
+        T[] resizedItems = (T[]) new Object[(items.length * 3)/2 + 1];
+        int index = 0;
+        for (; index < numItems; index++)
+            resizedItems[index] = items[(front + index) % items.length];
+        items = resizedItems;
+        front = 0;
+        back = index;
+    }
+}
+/**
+ * The Seat class represents an occupied seat in a movie theater auditorium.
+ * Seats keep track of the name of their occupant as well as a positional 
+ * number. This number indicates where the seat is in relation to the other
+ * seats in the auditorium.
+ *
+ * @author Eugene Koval
+ * @version 2017.04.15
+ */
+public class Seat {
+
+    /* The position of this Seat in the Auditorium. */
+    private int position;
+    /* The name of this Seat's occupant. */
+    private String occupant;
+
+    /**
+     * Constructor for a Seat.
+     * Constructs a Seat with positional information about where it is in the
+     * Auditorium and the name of its occupant.
+     *
+     * @param position this Seat's position in the Auditorium.
+     * @param occupant the name of this Seat's occupant.
+     */
+    public Seat(int position, String occupant) {
+        this.position = position;
+        this.occupant = occupant;
+    }
+
+    /**
+     * Returns this Seat's position in the Auditorium.
+     *
+     * @return this Seat's position in the Auditorium.
+     */
+    public int getPosition() {
+        return position;
+    }
+
+    /**
+     * Returns the name of this Seat's occupant.
+     *
+     * @return the name of this Seat's occupant.
+     */
+    public String getOccupant() {
+        return occupant;
+    }
+}
+/**
+ * Theater where all customers enter in order to purchase tickets.
+ * The theater contains a list of all customers present, auditoriums, and three
+ * queues. Customers enter the shortest queue available to them and enter the
+ * theater once they purchase their tickets.
+ *
+ * @author Brandon Campbell
+ * @author Eugene Koval
+ * @version 2017.04.23
+ */
+public class Theater
+{
+    /* A list of auditoriums in the theater. */
+    private AscendinglyOrderedList<Auditorium, String> auditoriums;
+    /* A list of customers that are present in the entire movie theater. */
+    private AscendinglyOrderedList<Customer, String> customers;
+    /* A list of each available line in the movie theater. */
+    private ListInterface<Line> lines;
+    /* The price for a single ticket into a movie. */
+    private double ticketPrice;
+    /* The line that is next in round robin order. */
+    private int nextLine;
+
+    /**
+     * Constructor for a Theater.
+     * Creates a theater with an empty collection of auditoriums, an empty
+     * collection of customers, and an empty collection of customer lines.
+     * <p>
+     * By default, the customer line to be served first is set to -1. This must
+     * be set to a value greater or equal to 0 and less than the total number
+     * of lines before the theater will function properly.
+     * <p>
+     * The price for one theater ticket, regardless of movie being seen, is the
+     * value passed as an argument.
+     *
+     * @param ticketPrice the price of one ticket.
+     */
+    public Theater(double ticketPrice) {
+        this.ticketPrice = ticketPrice;
+        auditoriums = new AscendinglyOrderedList<Auditorium, String>();
+        customers = new AscendinglyOrderedList<Customer, String>();
+        lines = new ArrayBasedList<Line>();
+        nextLine = -1;
+    }
+
+    /**
+     * Returns the price of one movie ticket.
+     *
+     * @return the price of one ticket.
+     */
+    public double getTicketPrice()
+    {
+        return ticketPrice;
+    }
+
+    /**
+     * Sets the price of a single ticket for a movie.
+     *
+     * @param price the price of a movie ticket.
+     */
+    public void setTicketPrice(double price)
+    {
+        this.ticketPrice = price;
+    }
+
+    /**
+     * Returns the index of the next customer line to be served.
+     *
+     * @return the index of the next line.
+     */
+    public int getNextLine()
+    {
+        return nextLine;
+    }
+
+    /**
+     * Sets the index of the next customer line to be served.
+     *
+     * @param nextLine the index of the next line.
+     */
+    public void setNextLine(int nextLine)
+    {
+        if (nextLine >= 0 && nextLine < lines.size())
+            this.nextLine = nextLine;
+        else
+            throw new TheaterException("Invalid index for next line.");
+    }
+
+    /**
+     * Returns the total number of customer lines.
+     *
+     * @return the total number of customer lines.
+     */
+    public int getNumberOfLines()
+    {
+        return lines.size();
+    }
+
+    /**
+     * Returns the total number of auditoriums in the theater.
+     * This number is equal to the total number of movies currently playing
+     * in this theater.
+     *
+     * @return the total number of auditoriums.
+     */
+    public int getNumberOfMovies()
+    {
+        return auditoriums.size();
+    }
+
+    /**
+     * Enqueues a customer in the shortest line available to them.
+     * This method is the only way to add customers to this theater. From the
+     * time they enter a line to the time they leave, a customer with a name
+     * matching the name of the given customer may not enter the theater.
+     * <p>
+     * The given customer may enter the express line only if hasChild is true.
+     * A customer bound for the express line will be put in a regular line
+     * instead if a regular line is atleast twice as short as the express line.
+     * Out of the regular lines, the customer will be put in the shortest one.
+     * <p>
+     * Returns the line into which the customer was placed.
+     *
+     * @param customer the customer to be enqueued.
+     * @param hasChild if true, the customer may be put in the express line.
+     * @return the line into which the customer was placed.
+     */
+    public Line enqueueCustomer(Customer customer, boolean hasChild)
+    {
+        Line shortest = getShortestLine(hasChild);
+        shortest.enqueue(customer);
+        customers.add(customer);
+        return shortest;
+    }
+
+    /**
+     * Returns true if a customer with a name matching the given name is
+     * currently in the theater's lines or auditoriums.
+     *
+     * @param name the name of the customer who is in the theater or not.
+     * @return true if a customer with the given name is in the theater.
+     */
+    public boolean containsCustomer(String name) {
+        return customers.contains(name);
+    }
+
+    /**
+     * Returns the shortest line that a customer is allowed to be in.
+     * If checkExpress is true, this method will check if there are any regular
+     * lines that are twice as short as the express line. If checkExpress is
+     * false, only the lengths of the regular lines will be compared.
+     *
+     * @param checkExpress whether to compare the express line length or not.
+     * @return the shortest line that a customer is allowed to be in.
+     */
+    private Line getShortestLine(boolean checkExpress)
+    {
+        int shortIndex;
+        double shortSize;
+        if (checkExpress) {
+            shortIndex = 0;
+            shortSize = lines.get(0).size() / 2.0;
+        }
+        else {
+            shortIndex = 1;
+            shortSize = lines.get(1).size();
+        }
+        int numLines = lines.size();
+        for (int i = shortIndex; i < numLines; i++) {
+            int currSize = lines.get(i).size();
+            if (currSize < shortSize) {
+                shortIndex = i;
+                shortSize = currSize;
+            }
+        }
+        return lines.get(shortIndex);
+    }
+
+    /**
+     * Returns true if the auditorium playing the given movie has a number of
+     * empty seats that is greater or equal to the given party size.
+     *
+     * @param movie the movie for which to check seat count.
+     * @param partySize the size of the customer party to find seating for.
+     * @return true if there are enough seats.
+     */
+    public boolean hasEnoughSeats(String movie, int partySize)
+    {
+        int remaining = auditoriums.get(movie).getRemainingSeats();
+        return remaining >= partySize;
+    }
+
+    /**
+     * Advances the line index of the next customer line to serve to the next
+     * one in the list.
+     * Lines are served in a round-robin manner. After the last line in the list
+     * is served, the line index will return to the first. Before this method
+     * can execute, the next-line index must have been manually set to a valid
+     * one.
+     */
+    private void advanceLine()
+    {
+        if (nextLine >= 0)
+            nextLine = (nextLine + 1) % lines.size();
+        else
+            throw new TheaterException(
+                "Customer line order has not been established.");
+    }
+
+    /**
+     * Finds the first auditorium that has enough empty seats to accommodate
+     * the given party size.
+     * The auditoriums are searched by the title of the movie they are playing.
+     * The movies are in ascending alphabetical order.
+     * Returns the name of the movie that can be seen by the entire viewing
+     * party. If all movies are sold out, an empty String is returned.
+     *
+     * @param partySize the party size to find seating for.
+     * @return the name of the movie, or an empty String if all movies sold out.
+     */
+    public String findFirstAvailableMovie(int partySize)
+    {
+        String availableMovie = "";
+        int numMovies = auditoriums.size();
+        for (int i = 0; i < numMovies && availableMovie.isEmpty(); i++) {
+            Auditorium current = auditoriums.get(i);
+            if (current.getRemainingSeats() >= partySize)
+                availableMovie = current.getKey();
+        }
+        return availableMovie;
+    }
+
+    /**
+     * Returns the customer that is next up to be served.
+     * If the line to served is empty, the next-line index is advanced until
+     * it comes back to the current line or it finds a customer. Note that this
+     * method only returns the customer reference. It does not remove the
+     * customer from the theater line.
+     *
+     * @return the next customer to be served.
+     */
+    public Customer getNextCustomer()
+    {
+        Customer customer = null;
+        int numLines = lines.size();
+        for (int i = 0; i < numLines && customer == null; i++) {
+            Queue<Customer> current = lines.get(nextLine);
+            if (! current.isEmpty())
+                customer = current.peek();
+            else
+                advanceLine();
+        }
+        return customer;
+    }
+
+    /**
+     * Dequeues the next customer in the current line and seats them in their
+     * desired auditorium.
+     * Assumes this auditorium will have enough empty seats to accommodate the
+     * entire customer party.
+     *
+     * @return the customer that has been served.
+     */
+    public Customer seatNextCustomer()
+    {
+        Customer next = dequeueNextCustomer();
+        auditoriums.get(next.getMovie())
+        .addParty(next.getKey(), next.getPartySize());
+        return next;
+    }
+
+    /**
+     * Dequeues and returns the next customer to be served.
+     * The index of the next line to be served is advanced.
+     *
+     * @return the next customer to be served.
+     */
+    private Customer dequeueNextCustomer()
+    {
+        Line current = lines.get(nextLine);
+        if (! current.isEmpty()) {
+            advanceLine();
+            return current.dequeue();
+        }
+        else
+            throw new TheaterException(
+                "The current customer line is empty!");
+    }
+
+    /**
+     * Returns the string representation of the line at the given index.
+     *
+     * @param lineIndex the index of line to get the String representation of.
+     * @return String representation of the line at the given index.
+     */
+    public String getLineInfo(int lineIndex)
+    {
+        return lines.get(lineIndex).toString();
+    }
+
+    /**
+     * Removes the next customer to be served from the theater.
+     * All records of this customer are removed from the theater.
+     * They leave without purchasing any tickets.
+     * The next-line index is advanced following this call.
+     */
+    public void removeFromLine()
+    {
+        customers.remove(dequeueNextCustomer().getKey());
+    }
+
+    /**
+     * Removes a customer and all members of their party from the theater.
+     * The customer party matching the given name is removed from whichever
+     * auditorium they were watching their movie in.
+     *
+     * @param name the name of the customer party to remove.
+     */
+    public void removeFromTheater(String name)
+    {
+        try {
+            Customer customer = customers.remove(name);
+            Auditorium aud = auditoriums.get(customer.getMovie());
+            aud.removeParty(name, customer.getPartySize());
+        }
+        catch (ListException ex) {
+            throw new TheaterException(
+                "This customer not in Movie Theater!");
+        }
+    }
+
+    /**
+     * Returns the total number of tickets sold for the given movie.
+     *
+     * @param movie the movie for which to get the number of tickets sold.
+     * @return the number of tickets sold.
+     */
+    public int getNumberOfTicketsSold(String movie)
+    {
+        return auditoriums.get(movie).getTicketsSold();
+    }
+
+    /**
+     * Each auditorium keeps count of its individual ticket sales.
+     * Each auditorium's sales are printed out along with a grand total.
+     * @return total Total sales made so far.
+     */
+    public double getTicketSales()
+    {
+        int totalTickets = 0;
+        for(int i = 0, numAuds = auditoriums.size(); i < numAuds; i++)
+            totalTickets += auditoriums.get(i).getTicketsSold();
+        return totalTickets * ticketPrice;
+    }
+
+    /**
+     * Adds a new auditorium for a movie to be played in.
+     * @param auditorium the auditorium to be added to the theater list.
+     */
+    public void addAuditorium(Auditorium auditorium)
+    {
+        auditoriums.add(auditorium);
+    }
+
+    /**
+     * Removes an existing auditorium from this theater.
+     * The auditorium removed will be the one that is playing the given movie.
+     *
+     * @param movie the auditorium playing this movie will be removed.
+     */
+    public void removeAuditorium(String movie)
+    {
+        auditoriums.remove(movie);
+    }
+
+    /**
+     * Add a customer line to the theater.
+     * The line's name will be the given name.
+     *
+     * @param lineName the name of the new line to add to the theater.
+     */
+    public void addLine(String lineName) {
+        lines.add(lines.size(), new Line(lineName));
+    }
+
+    /**
+     * Checks each line to see if they are all empty.
+     *
+     * @return true if all customer lines are empty.
+     */
+    public boolean allLinesEmpty()
+    {
+        boolean allEmpty = true;
+        for (int i = 0, size = lines.size(); i < size && allEmpty; i++)
+            allEmpty = lines.get(i).isEmpty();
+        return allEmpty;
+    }
+
+    /**
+     * Checks each auditorium to see if they are all empty.
+     *
+     * @return true if all auditoriums are empty.
+     */
+    public boolean allMoviesEmpty()
+    {
+        boolean allEmpty = true;
+        for (int i = 0, size = auditoriums.size(); i < size && allEmpty; i++)
+            allEmpty = auditoriums.get(i).isEmpty();
+        return allEmpty;
+    }
+
+    /**
+     * Returns the seating chart of the auditorium playing the given movie.
+     * The seating chart is returned as a formatted String displaying
+     * information about each seat in the auditorium. The seats are numbered by
+     * their position in the rows of seats.
+     *
+     * @param movie the movie indicating which Auditorium to get seating chart for
+     * @return the given movie's auditorium's seating chart.
+     */
+    public String getSeatingChart(String movie)
+    {
+        return auditoriums.get(movie).generateSeatingChart();
+    }
+}
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.lang.NumberFormatException;
+
+/**
+ * The Main class for the Wonderful Movie Theater Program.
+ * This class handles all user input/output and coordinates all actions 
+ * requested by the user.
+ *
+ * @author Eugene Koval
+ * @version 2017.04.22
+ */
+public class TheaterDriver {
+    
+    /** Buffered Reader for handling of all user input/output. */
+    public static BufferedReader stdin = new BufferedReader(
+                                         new InputStreamReader(
+                                         System.in));
+    
+    /**
+     * The program's main method.
+     * Prints a greeting message, creates a theater with auditoriums for 
+     * the "Life" and "Logan" movies, and adds three customer lines to the 
+     * theater. Then, runs the program loop.
+     *
+     * @param args program commandline arguments (not used)
+     */
+    public static void main(String[] args) {
+    
+        // Prints Theater greeting.
+        System.out.println("\nWelcome to the Wonderful Movie Theater program!" +
+            "\n\tTonight's feature are:\n\t\t\"Life\" and \"Logan\"");
+
+        // Assembles a theater with users's input.
+        System.out.println("\nPlease specifiy the size of the Movie Theaters:");
+        Auditorium logan = createAuditorium("Logan");
+        Auditorium life = createAuditorium("Life");
+        double price = getDoubleInput("\t>> Enter the price of a ticket");
+        Theater theater = new Theater(price);
+        theater.addAuditorium(logan);
+        theater.addAuditorium(life);
+        theater.addLine("express");
+        theater.addLine("first");
+        theater.addLine("second");
+
+        // The program's main loop.
+        for (String option; ! (option = getMenuInput()).equals("8");)
+            dispatchAction(theater, option);
+
+        // Closes the program.
+        System.out.println("The Wonderful Movie Theater, who earned $" + 
+            theater.getTicketSales() + ", kicks out remaining customers and " + 
+            "closes...");
+        close();
+    }
+    
+    /**
+     * Constructs and returns an auditorium.
+     * Prompts the user for specifications for the auditorium that will play
+     * the given movie. The returned auditorium will match these specifications.
+     *
+     * @param movie the movie for which to construct the auditorium.
+     * @return the constructed auditorium.
+     */
+    public static Auditorium createAuditorium(String movie) {
+        System.out.println("Enter information about the " +
+            movie + " Movie Theater:");
+        int rows = getIntegerInput("\t\t>> Enter number of rows");
+        int seats = getIntegerInput(
+                    "\t\t>> Enter number of seats in a row");
+        return new Auditorium(movie, rows, seats);
+    }
+
+    /**
+     * Closes the Buffered Reader.
+     * Prints a goodbye message if the Buffered Reader closed successfully.
+     */
+    public static void close() {
+        try {
+            stdin.close();
+            System.out.println("Good Bye!");
+        }
+        catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /*
+     * ************************************************************************
+     * User Input Methods
+     * ************************************************************************
+     */
+    
+    /**
+     * Gets user input given a prompt message.
+     * Returns the user's response to the prompt. Note that a colon and space 
+     * are appended to the given prompt. The prompt will show as follows:
+     *
+     * "prompt: "
+     *
+     * @param prompt the message to show to user to prompt for input.
+     * @return the user's response to the prompt.
+     */
+    public static String getInput(String prompt) {
+        System.out.print(prompt + ": ");
+        String input = "";
+        try {
+            input = stdin.readLine().trim();
+        }
+        catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        System.out.println(input);
+        return input;
+    }
+
+    /**
+     * Gets a user integer input given a prompt message.
+     * Returns the user's integer if it is strictly greater than zero. If a
+     * integer that is zero or less, or not an integer at all, is entered,
+     * the prompt will repeat.
+     *
+     * @param prompt the message to show to user to prompt for input.
+     * @return the user's integer response to the prompt.
+     */
+    public static int getIntegerInput(String prompt) {
+        int response = 0;
+        boolean valid = false;
+        do {
+            try {
+                response = Integer.parseInt(getInput(prompt));
+                if (response > 0)
+                    valid = true;
+                else
+                    System.out.println("\n\tNumber must be greater than zero!\n");
+            }
+            catch (NumberFormatException ex) {
+                System.out.println("\n\tInput must be a number!\n");
+            }
+        } while (! valid);
+        return response;
+    }
+
+    /**
+     * Gets a user Double input given a prompt message.
+     * Returns the user's Double if it is strictly greater than zero. If a
+     * Double that is zero or less, or not an Double at all, is entered,
+     * the prompt will repeat.
+     *
+     * @param prompt the message to show to user to prompt for input.
+     * @return the user's Double response to the prompt.
+     */
+    public static double getDoubleInput(String prompt) {
+        double response = 0;
+        boolean valid = false;
+        do {
+            try {
+                response = Double.parseDouble(getInput(prompt));
+                if (response > 0)
+                    valid = true;
+                else
+                    System.out.println("\n\tNumber must be greater than zero!\n");
+            }
+            catch (NumberFormatException ex) {
+                System.out.println("\n\tInput must be a number!\n");
+            }
+        } while (! valid);
+        return response;
+    }
+
+    /**
+     * Asks the user a question.
+     * Prompts the user with the given prompt message and the given array
+     * of possible answers. If <i>showPossible</i> is true, prompt shows up 
+     * as follows:
+     * <p>
+     * <b>prompt (answer1/answer2/.../answerN):</b>
+     * <p>
+     * Returns the index of the answer that was chosen.
+     * User answers that do not match exactly with one of the possible answers
+     * will be rejected. The prompt will keep running until a valid answer is 
+     * given.
+     *
+     * @param prompt the question to show to the user to prompt for input.
+     * @param answers the array of valid answers.
+     * @param showPossible if true, will show all possible answers to user.
+     * @return the index of the user's answer.
+     */
+    public static int askQuestion(String prompt, String[] answers, 
+    boolean showPossible) {
+        if (showPossible) { 
+            String ansString = "(";
+            for (int i = 0, last = answers.length - 1; i < answers.length; i++) {
+                ansString += answers[i];
+                if (i != last)
+                    ansString += '/';
+            }
+            ansString += ")";
+            prompt = prompt + ' ' + ansString; 
+        }
+        int choice;
+        boolean validAnswer = false;
+        do {
+            choice = 0; 
+            String response = getInput(prompt);
+            // Check against each possible answer.
+            while (choice < answers.length && ! validAnswer)
+                if (response.equals(answers[choice]))
+                    validAnswer = true;
+                else
+                    choice++;
+            if (! validAnswer)
+                System.out.println("\n\tThat is not a valid answer!\n");
+        } while (! validAnswer);
+        return choice;
+    }
+
+    /**
+     * Asks the user a yes-no question.
+     * Prompts the user with the given prompt message.
+     * The prompt shows up as follows:
+     * <p>
+     * <b>prompt (Y/N):</b>
+     * <p>
+     * The prompt will keep running until a case-sensitive 'Y' or 'N' are 
+     * given. Returns true if the user input a 'Y'. Returns false if the 
+     * use input a 'N'.
+     *
+     * @param prompt the yes-no question to show to the user.
+     * @return true if user answers with a 'Y'; false if user enters a 'N'.
+     */
+    public static boolean askPolarQuestion(String prompt) {
+        int response = askQuestion(prompt, new String[]{"Y", "N"}, true);
+        return response == 0;
+    }
+
+    /**
+     * Prints the program menu and gets user's menu option.
+     * The program menu contains the following options:
+       <p>  1. Customer(s) enter(s) Movie Theater.
+       <p>  2. Customer buys ticket(s).
+       <p>  3. Customer(s) leave(s) the theater.
+       <p>  4. Display info about customers waiting for tickets.
+       <p>  5. Display seating chart for Life Movie Theater.
+       <p>  6. Display seating chart for Logan Movie Theater.
+       <p>  7. Display number of tickets sold and total earnings.
+       <p>  8. End the program.
+       <p> 
+     * Returns the user's menu choice.
+     *
+     * @return the user's menu choice.
+     */
+    public static String getMenuInput() {
+        System.out.println(
+            "\nSelect an operation from the following menu:"
+            + "\n\t1. Customer(s) enter(s) Movie Theater."
+            + "\n\t2. Customer buys ticket(s)."
+            + "\n\t3. Customer(s) leave(s) the theater."
+            + "\n\t4. Display info about customers waiting for tickets."
+            + "\n\t5. Display seating chart for Life Movie Theater."
+            + "\n\t6. Display seating chart for Logan Movie Theater."
+            + "\n\t7. Display number of tickets sold and total earnings."
+            + "\n\t8. End the program."
+        );
+        return getInput(">> Make your selection now");
+    }
+
+    /*
+     * ************************************************************************
+     * Program Actions
+     * ************************************************************************
+     */
+
+    /**
+     * Triggers the appropriate action based on the given option.
+     * An action is performed on the given theater based on the given option.
+     *
+     * @param theater the theater on which to perform the action.
+     * @param option this option dictates which action will be taken.
+     */
+    public static void dispatchAction(Theater theater, String option) {
+        System.out.println();
+        switch(option) {
+            case "1":
+                enterCustomer(theater);
+                break;
+            case "2":
+                buyTickets(theater);
+                break;
+            case "3":
+                removeCustomer(theater);
+                break;
+            case "4":
+                displayCustomerLine(theater);
+                break;
+            case "5":
+                displaySeating(theater, "Life");
+                break;
+            case "6":
+                displaySeating(theater, "Logan");
+                break;
+            case "7":
+                displayTicketInfo(theater);
+                break;
+            default:
+                System.out.println(
+                    "I'm sorry. I don't understand " + option);
+                break;
+        }
+    }
+    
+    /**
+     * Enter a customer into the movie theater line.
+     * The user is prompted for the customer's name, the size of their party,
+     * and the movie they would like to see. The name must not match with any 
+     * customer that is currently in line or watching a movie in the theater. 
+     * If there is a name conflict, the user will be prompted for a new name 
+     * until no conflict arises.The user is also asked if the customer has a 
+     * child 11 or younger with them. The response to this question will dictate 
+     * whether the customer may enter the express line or not. Once a customer 
+     * is constructed based on the input data, they are entered into the given 
+     * theater.
+     *
+     * @param theater the theater into which to place the new customer.
+     */
+    public static void enterCustomer(Theater theater) {
+        String name = "";
+        do {
+            String input = getInput("\t>> Enter customer name");
+            if (! theater.containsCustomer(input))
+                name = input;
+            else
+                System.out.println(
+                    "Customer " + input + " is already in the theater!");
+        } while (name.isEmpty());
+        int partySize = getIntegerInput("\t>> Enter party size");
+        String[] movies = {"Life", "Logan"};
+        int movie = askQuestion("\t>> Enter movie name", movies, false);
+        String movieString = movies[movie];
+        Customer customer = new Customer(name, movieString, partySize);
+        boolean hasChild = askPolarQuestion(
+            "\t>> Is a child 11 or younger in this party?");
+        Line line = theater.enqueueCustomer(customer, hasChild);
+        System.out.println(
+            "\nCustomer " + name + " is in " + line.getName() + " ticket line.");
+    }
+
+    /**
+     * Serve a customer waiting in the theater line.
+     * If the given theater has not designated a line to serve next, the user
+     * will be prompted to select which line they would like to serve first.
+     * The customer in that line will be served by the given theater.
+     *
+     * @param theater the theater that will serve its customer.
+     */
+    public static void buyTickets(Theater theater) {
+        if (theater.getNextLine() == -1) 
+            determineLineOrder(theater);
+        if (! theater.allLinesEmpty())
+            serveCustomer(theater);
+        else 
+            System.out.println("There are no customers waiting in any line.");
+    }   
+
+    /**
+     * Remove a customer from the theater.
+     * The user is prompted for the customer's name. All party members under
+     * the entered name will be removed from the theater. All records of the 
+     * customer will be removed from the theater.
+     *
+     * @param theater the theater from which to remove a customer.
+     */
+    public static void removeCustomer(Theater theater) {
+        if (theater.allMoviesEmpty())
+            System.out.println(
+                "No customers are in the movie theater at this time.");
+        else {
+            String name = getInput(
+                "\t>> Enter customer name to leave Movie Theater");
+            try {
+                theater.removeFromTheater(name);
+                System.out.println(
+                    "\nCustomer " + name + " has left the Movie Theater.");
+            }
+            catch (TheaterException ex) {
+                System.out.println("\n" + ex.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Display information about the customers waiting in line.
+     * Displays the customers in each of the given theater's lines.
+     *
+     * @param theater the theater for which to display customer lines.
+     */
+    public static void displayCustomerLine(Theater theater) {
+        int numLines = theater.getNumberOfLines();
+        for (int i = 1; i <= numLines; i++)
+        {
+            // The (i % numLines) parameter is used to list lines starting from 
+            // line 1 and end with the express line.
+            System.out.println(theater.getLineInfo(i % numLines));
+        }
+    }
+
+    /**
+     * Displays an auditorium's seating chart.
+     * Displays the given theater's auditorium seating chart for the given 
+     * movie.
+     *
+     * @param theater the theater for which to display the seating chart.
+     * @param movie the movie auditorium for which to display the seating chart.
+     */
+    public static void displaySeating(Theater theater, String movie) {
+        System.out.println(
+            "Here's the seating chart for the " + movie + " Movie Theater:");
+        System.out.println(theater.getSeatingChart(movie)); 
+    }
+
+    /**
+     * Displays information about the tickets sold.
+     * Displays the number of tickets sold for each movie as well as 
+     * the total earnings for the given theater.
+     *
+     * @param theater the theater for which to display ticket information.
+     */
+    public static void displayTicketInfo(Theater theater) {
+        System.out.println(theater.getNumberOfTicketsSold("Life") 
+            + " tickets have been sold for the Life Movie.");
+        System.out.println(theater.getNumberOfTicketsSold("Logan") 
+            + " ticekts have been sold for the Logan Movie.");
+        System.out.println("Total earnings: $" + theater.getTicketSales());
+    }
+
+    /*
+     * ************************************************************************
+     * Helper Methods for Actions
+     * ************************************************************************
+     */
+
+    /**
+     * Asks the user which customer line they would like to serve first.
+     * The user may choose the express line or one of the two regular lines.
+     *
+     * @param theater the theater for which to determine line order.
+     */
+    public static void determineLineOrder(Theater theater) {
+        int nextLine = askQuestion(
+            "Which line would you like to serve customers first?", 
+            new String[]{"Express", "Reg1", "Reg2"},
+            true
+        );
+        theater.setNextLine(nextLine);
+        System.out.println();
+    }
+
+    /**
+     * Serve the next customer in line.
+     * Gets the customer to be served next in the given theater.
+     * Tries to seat the customer in their desired movie.
+     * If that movie is sold out, tries to find an alternate movie.
+     *
+     * @param theater the theater from which to serve the customer.
+     */
+    public static void serveCustomer(Theater theater) {
+        Customer customer = theater.getNextCustomer();
+        String customerName = customer.getKey();
+        String movie = customer.getMovie();
+        int partySize = customer.getPartySize();
+        System.out.println("Serving customer " + customerName + "...");
+        if (theater.hasEnoughSeats(movie, partySize))
+            seatCustomer(theater);
+        else 
+            findAlternateMovie(theater, customer);
+    }
+
+    /**
+     * Tries to assign a movie to a customer that is not sold out.
+     * If a movie with enough seats to accomodate the customer is found, the 
+     * user will be asked whether they want to see the alternate movie.
+     * If they deny or if all movies are sold out, the customer will be ejected
+     * from the theater.
+     *
+     * @param theater the theater in which to find an alternate movie.
+     * @param customer the customer for which to find the movie.
+     */
+    public static void findAlternateMovie(Theater theater, Customer customer) {
+        String movie = theater.findFirstAvailableMovie(customer.getPartySize());
+        if (! movie.isEmpty()) {
+            System.out.println("Sorry. This movie is sold out.");
+            boolean seeOther = askPolarQuestion(
+                "Would you like to see the other movie?");
+            if (seeOther) {
+                customer.setMovie(movie);
+                seatCustomer(theater);
+            }
+            else {
+                System.out.println("Good bye!");
+                ejectCustomer(theater, customer.getKey());
+            }
+        }
+        else {
+            System.out.println("Sorry. Both movies are sold out. Good bye!");
+            ejectCustomer(theater, customer.getKey());
+        }
+    }
+
+    /**
+     * Seat the customer into the auditorium playing their desired movie.
+     * Seats the next customer in line into their desired movie.
+     * Assumes the customer's movie will not be sold out.
+     *
+     * @param theater the theater in which to seat the customer.
+     */ 
+    public static void seatCustomer(Theater theater) {
+        Customer customer = theater.seatNextCustomer();
+        System.out.println("\n"
+            + customer.getKey() + ", party of " + customer.getPartySize()
+            + ", has been seated in the " + customer.getMovie()
+            + " Movie Theater.");
+    }
+
+    /**
+     * Removes the next customer in line from the theater.
+     * The customer to be served next will not view any movie, or purchase 
+     * any tickets. All record of them will be removed from the given theater.
+     *
+     * @param theater the theater from which to remove the customer.
+     * @param name the customer's name.
+     */
+    public static void ejectCustomer(Theater theater, String name) {
+        System.out.println("\nCustomer " + name + " has left the Movie Theater.");
+        theater.removeFromLine();
+    }
+}
+
+Welcome to the Wonderful Movie Theater program!
+	Tonight's feature are:
+		"Life" and "Logan"
+
+Please specifiy the size of the Movie Theaters:
+Enter information about the Logan Movie Theater:
+		>> Enter number of rows: 3
+		>> Enter number of seats in a row: 4
+Enter information about the Life Movie Theater:
+		>> Enter number of rows: 2
+		>> Enter number of seats in a row: 5
+	>> Enter the price of a ticket: 8.75
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 is free.
+Row 1 seat 2 is free.
+Row 1 seat 3 is free.
+Row 1 seat 4 is free.
+Row 1 seat 5 is free.
+Row 2 seat 1 is free.
+Row 2 seat 2 is free.
+Row 2 seat 3 is free.
+Row 2 seat 4 is free.
+Row 2 seat 5 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 6
+
+Here's the seating chart for the Logan Movie Theater:
+
+Row 1 seat 1 is free.
+Row 1 seat 2 is free.
+Row 1 seat 3 is free.
+Row 1 seat 4 is free.
+Row 2 seat 1 is free.
+Row 2 seat 2 is free.
+Row 2 seat 3 is free.
+Row 2 seat 4 is free.
+Row 3 seat 1 is free.
+Row 3 seat 2 is free.
+Row 3 seat 3 is free.
+Row 3 seat 4 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 7
+
+0 tickets have been sold for the Life Movie.
+0 ticekts have been sold for the Logan Movie.
+Total earnings: $0.0
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Which line would you like to serve customers first? (Express/Reg1/Reg2): Reg1
+
+There are no customers waiting in any line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 3
+
+No customers are in the movie theater at this time.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 4
+
+No customers in the first line!
+No customers in the second line!
+No customers in the express line!
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Pikachu
+	>> Enter party size: 3
+	>> Enter movie name: Logan
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Pikachu is in first ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 4
+
+The following customer is in the first line:
+	Customer Pikachu party of 3 for Logan movie. 
+No customers in the second line!
+No customers in the express line!
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Pikachu...
+
+Pikachu, party of 3, has been seated in the Logan Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Mew
+	>> Enter party size: 1
+	>> Enter movie name: Logan
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Mew is in first ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Audino
+	>> Enter party size: 4
+	>> Enter movie name: Life
+	>> Is a child 11 or younger in this party? (Y/N): Y
+
+Customer Audino is in express ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Charzard
+	>> Enter party size: 4
+	>> Enter movie name: Logan
+	>> Is a child 11 or younger in this party? (Y/N): Y
+
+Customer Charzard is in second ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Pikachu
+Customer Pikachu is already in the theater!
+	>> Enter customer name: Charzard
+Customer Charzard is already in the theater!
+	>> Enter customer name: Piplop
+	>> Enter party size: 3
+	>> Enter movie name: Logan
+	>> Is a child 11 or younger in this party? (Y/N): Y
+
+Customer Piplop is in express ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 4
+
+The following customer is in the first line:
+	Customer Mew party of 1 for Logan movie. 
+The following customer is in the second line:
+	Customer Charzard party of 4 for Logan movie. 
+The following customer is in the express line:
+	Customer Audino party of 4 for Life movie. 
+	Customer Piplop party of 3 for Logan movie. 
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 is free.
+Row 1 seat 2 is free.
+Row 1 seat 3 is free.
+Row 1 seat 4 is free.
+Row 1 seat 5 is free.
+Row 2 seat 1 is free.
+Row 2 seat 2 is free.
+Row 2 seat 3 is free.
+Row 2 seat 4 is free.
+Row 2 seat 5 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 6
+
+Here's the seating chart for the Logan Movie Theater:
+
+Row 1 seat 1 used by Pikachu's party.
+Row 1 seat 2 used by Pikachu's party.
+Row 1 seat 3 used by Pikachu's party.
+Row 1 seat 4 is free.
+Row 2 seat 1 is free.
+Row 2 seat 2 is free.
+Row 2 seat 3 is free.
+Row 2 seat 4 is free.
+Row 3 seat 1 is free.
+Row 3 seat 2 is free.
+Row 3 seat 3 is free.
+Row 3 seat 4 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 7
+
+0 tickets have been sold for the Life Movie.
+3 ticekts have been sold for the Logan Movie.
+Total earnings: $26.25
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Abra
+	>> Enter party size: 1
+	>> Enter movie name: Life
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Abra is in first ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Charzard...
+
+Charzard, party of 4, has been seated in the Logan Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Audino...
+
+Audino, party of 4, has been seated in the Life Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Mew...
+
+Mew, party of 1, has been seated in the Logan Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Piplop...
+
+Piplop, party of 3, has been seated in the Logan Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Abra...
+
+Abra, party of 1, has been seated in the Life Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 4
+
+No customers in the first line!
+No customers in the second line!
+No customers in the express line!
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Audino's party.
+Row 1 seat 2 used by Audino's party.
+Row 1 seat 3 used by Audino's party.
+Row 1 seat 4 used by Audino's party.
+Row 1 seat 5 used by Abra's party.
+Row 2 seat 1 is free.
+Row 2 seat 2 is free.
+Row 2 seat 3 is free.
+Row 2 seat 4 is free.
+Row 2 seat 5 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 6
+
+Here's the seating chart for the Logan Movie Theater:
+
+Row 1 seat 1 used by Pikachu's party.
+Row 1 seat 2 used by Pikachu's party.
+Row 1 seat 3 used by Pikachu's party.
+Row 1 seat 4 used by Charzard's party.
+Row 2 seat 1 used by Charzard's party.
+Row 2 seat 2 used by Charzard's party.
+Row 2 seat 3 used by Charzard's party.
+Row 2 seat 4 used by Mew's party.
+Row 3 seat 1 used by Piplop's party.
+Row 3 seat 2 used by Piplop's party.
+Row 3 seat 3 used by Piplop's party.
+Row 3 seat 4 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 7
+
+5 tickets have been sold for the Life Movie.
+11 ticekts have been sold for the Logan Movie.
+Total earnings: $140.0
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Kadabra
+	>> Enter party size: 3
+	>> Enter movie name: Life
+	>> Is a child 11 or younger in this party? (Y/N): Y
+
+Customer Kadabra is in express ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Kadabra...
+
+Kadabra, party of 3, has been seated in the Life Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 4
+
+No customers in the first line!
+No customers in the second line!
+No customers in the express line!
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Audino's party.
+Row 1 seat 2 used by Audino's party.
+Row 1 seat 3 used by Audino's party.
+Row 1 seat 4 used by Audino's party.
+Row 1 seat 5 used by Abra's party.
+Row 2 seat 1 used by Kadabra's party.
+Row 2 seat 2 used by Kadabra's party.
+Row 2 seat 3 used by Kadabra's party.
+Row 2 seat 4 is free.
+Row 2 seat 5 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 6
+
+Here's the seating chart for the Logan Movie Theater:
+
+Row 1 seat 1 used by Pikachu's party.
+Row 1 seat 2 used by Pikachu's party.
+Row 1 seat 3 used by Pikachu's party.
+Row 1 seat 4 used by Charzard's party.
+Row 2 seat 1 used by Charzard's party.
+Row 2 seat 2 used by Charzard's party.
+Row 2 seat 3 used by Charzard's party.
+Row 2 seat 4 used by Mew's party.
+Row 3 seat 1 used by Piplop's party.
+Row 3 seat 2 used by Piplop's party.
+Row 3 seat 3 used by Piplop's party.
+Row 3 seat 4 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Slowpoke
+	>> Enter party size: 2
+	>> Enter movie name: Logan
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Slowpoke is in first ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 4
+
+The following customer is in the first line:
+	Customer Slowpoke party of 2 for Logan movie. 
+No customers in the second line!
+No customers in the express line!
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Slowpoke...
+Sorry. This movie is sold out.
+Would you like to see the other movie? (Y/N): Y
+
+Slowpoke, party of 2, has been seated in the Life Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 3
+
+	>> Enter customer name to leave Movie Theater: Mew
+
+Customer Mew has left the Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 4
+
+No customers in the first line!
+No customers in the second line!
+No customers in the express line!
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Audino's party.
+Row 1 seat 2 used by Audino's party.
+Row 1 seat 3 used by Audino's party.
+Row 1 seat 4 used by Audino's party.
+Row 1 seat 5 used by Abra's party.
+Row 2 seat 1 used by Kadabra's party.
+Row 2 seat 2 used by Kadabra's party.
+Row 2 seat 3 used by Kadabra's party.
+Row 2 seat 4 used by Slowpoke's party.
+Row 2 seat 5 used by Slowpoke's party.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 6
+
+Here's the seating chart for the Logan Movie Theater:
+
+Row 1 seat 1 used by Pikachu's party.
+Row 1 seat 2 used by Pikachu's party.
+Row 1 seat 3 used by Pikachu's party.
+Row 1 seat 4 used by Charzard's party.
+Row 2 seat 1 used by Charzard's party.
+Row 2 seat 2 used by Charzard's party.
+Row 2 seat 3 used by Charzard's party.
+Row 2 seat 4 is free.
+Row 3 seat 1 used by Piplop's party.
+Row 3 seat 2 used by Piplop's party.
+Row 3 seat 3 used by Piplop's party.
+Row 3 seat 4 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 7
+
+10 tickets have been sold for the Life Movie.
+11 ticekts have been sold for the Logan Movie.
+Total earnings: $183.75
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Slowbro
+	>> Enter party size: 2
+	>> Enter movie name: Life
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Slowbro is in first ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Seel
+	>> Enter party size: 4
+	>> Enter movie name: Life
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Seel is in second ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Jigglypuff
+	>> Enter party size: 2
+	>> Enter movie name: Logan
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Jigglypuff is in first ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Seel...
+Sorry. Both movies are sold out. Good bye!
+
+Customer Seel has left the Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Slowbro...
+Sorry. This movie is sold out.
+Would you like to see the other movie? (Y/N): Y
+
+Slowbro, party of 2, has been seated in the Logan Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Jigglypuff...
+Sorry. Both movies are sold out. Good bye!
+
+Customer Jigglypuff has left the Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 4
+
+No customers in the first line!
+No customers in the second line!
+No customers in the express line!
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 3
+
+	>> Enter customer name to leave Movie Theater: Kadabra
+
+Customer Kadabra has left the Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 3
+
+	>> Enter customer name to leave Movie Theater: Charzard
+
+Customer Charzard has left the Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 3
+
+	>> Enter customer name to leave Movie Theater: Mew
+
+This customer not in Movie Theater!
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 4
+
+No customers in the first line!
+No customers in the second line!
+No customers in the express line!
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Audino's party.
+Row 1 seat 2 used by Audino's party.
+Row 1 seat 3 used by Audino's party.
+Row 1 seat 4 used by Audino's party.
+Row 1 seat 5 used by Abra's party.
+Row 2 seat 1 is free.
+Row 2 seat 2 is free.
+Row 2 seat 3 is free.
+Row 2 seat 4 used by Slowpoke's party.
+Row 2 seat 5 used by Slowpoke's party.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 6
+
+Here's the seating chart for the Logan Movie Theater:
+
+Row 1 seat 1 used by Pikachu's party.
+Row 1 seat 2 used by Pikachu's party.
+Row 1 seat 3 used by Pikachu's party.
+Row 1 seat 4 is free.
+Row 2 seat 1 is free.
+Row 2 seat 2 is free.
+Row 2 seat 3 is free.
+Row 2 seat 4 used by Slowbro's party.
+Row 3 seat 1 used by Piplop's party.
+Row 3 seat 2 used by Piplop's party.
+Row 3 seat 3 used by Piplop's party.
+Row 3 seat 4 used by Slowbro's party.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 7
+
+10 tickets have been sold for the Life Movie.
+13 ticekts have been sold for the Logan Movie.
+Total earnings: $201.25
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 3
+
+	>> Enter customer name to leave Movie Theater: Jigglypuff
+
+This customer not in Movie Theater!
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Audino's party.
+Row 1 seat 2 used by Audino's party.
+Row 1 seat 3 used by Audino's party.
+Row 1 seat 4 used by Audino's party.
+Row 1 seat 5 used by Abra's party.
+Row 2 seat 1 is free.
+Row 2 seat 2 is free.
+Row 2 seat 3 is free.
+Row 2 seat 4 used by Slowpoke's party.
+Row 2 seat 5 used by Slowpoke's party.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 6
+
+Here's the seating chart for the Logan Movie Theater:
+
+Row 1 seat 1 used by Pikachu's party.
+Row 1 seat 2 used by Pikachu's party.
+Row 1 seat 3 used by Pikachu's party.
+Row 1 seat 4 is free.
+Row 2 seat 1 is free.
+Row 2 seat 2 is free.
+Row 2 seat 3 is free.
+Row 2 seat 4 used by Slowbro's party.
+Row 3 seat 1 used by Piplop's party.
+Row 3 seat 2 used by Piplop's party.
+Row 3 seat 3 used by Piplop's party.
+Row 3 seat 4 used by Slowbro's party.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 7
+
+10 tickets have been sold for the Life Movie.
+13 ticekts have been sold for the Logan Movie.
+Total earnings: $201.25
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 8
+The Wonderful Movie Theater, who earned $201.25, kicks out remaining customers and closes...
+Good Bye!
+
+Welcome to the Wonderful Movie Theater program!
+	Tonight's feature are:
+		"Life" and "Logan"
+
+Please specifiy the size of the Movie Theaters:
+Enter information about the Logan Movie Theater:
+		>> Enter number of rows: 1
+		>> Enter number of seats in a row: 1
+Enter information about the Life Movie Theater:
+		>> Enter number of rows: 10
+		>> Enter number of seats in a row: 2
+	>> Enter the price of a ticket: 5.00
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Which line would you like to serve customers first? (Express/Reg1/Reg2): Express
+
+There are no customers waiting in any line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Mario
+	>> Enter party size: 2
+	>> Enter movie name: Life
+	>> Is a child 11 or younger in this party? (Y/N): Y
+
+Customer Mario is in express ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Bowser
+	>> Enter party size: 1
+	>> Enter movie name: Life
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Bowser is in first ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Mario...
+
+
+Mario, party of 2, has been seated in the Life Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Bowser...
+
+
+Bowser, party of 1, has been seated in the Life Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Pikachu
+	>> Enter party size: 10
+	>> Enter movie name: Life
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Pikachu is in first ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Pikachu...
+
+
+Pikachu, party of 10, has been seated in the Life Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Mario's party.
+Row 1 seat 2 used by Mario's party.
+Row 2 seat 1 used by Bowser's party.
+Row 2 seat 2 used by Pikachu's party.
+Row 3 seat 1 used by Pikachu's party.
+Row 3 seat 2 used by Pikachu's party.
+Row 4 seat 1 used by Pikachu's party.
+Row 4 seat 2 used by Pikachu's party.
+Row 5 seat 1 used by Pikachu's party.
+Row 5 seat 2 used by Pikachu's party.
+Row 6 seat 1 used by Pikachu's party.
+Row 6 seat 2 used by Pikachu's party.
+Row 7 seat 1 used by Pikachu's party.
+Row 7 seat 2 is free.
+Row 8 seat 1 is free.
+Row 8 seat 2 is free.
+Row 9 seat 1 is free.
+Row 9 seat 2 is free.
+Row 10 seat 1 is free.
+Row 10 seat 2 is free.
+
+Seat 1: Mario
+Seat 2: Mario
+Seat 3: Bowser
+Seat 4: Pikachu
+Seat 5: Pikachu
+Seat 6: Pikachu
+Seat 7: Pikachu
+Seat 8: Pikachu
+Seat 9: Pikachu
+Seat 10: Pikachu
+Seat 11: Pikachu
+Seat 12: Pikachu
+Seat 13: Pikachu
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 3
+
+	>> Enter customer name to leave Movie Theater: Bowser
+
+Customer Bowser has left the Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Mario's party.
+Row 1 seat 2 used by Mario's party.
+Row 2 seat 1 is free.
+Row 2 seat 2 used by Pikachu's party.
+Row 3 seat 1 used by Pikachu's party.
+Row 3 seat 2 used by Pikachu's party.
+Row 4 seat 1 used by Pikachu's party.
+Row 4 seat 2 used by Pikachu's party.
+Row 5 seat 1 used by Pikachu's party.
+Row 5 seat 2 used by Pikachu's party.
+Row 6 seat 1 used by Pikachu's party.
+Row 6 seat 2 used by Pikachu's party.
+Row 7 seat 1 used by Pikachu's party.
+Row 7 seat 2 is free.
+Row 8 seat 1 is free.
+Row 8 seat 2 is free.
+Row 9 seat 1 is free.
+Row 9 seat 2 is free.
+Row 10 seat 1 is free.
+Row 10 seat 2 is free.
+
+Seat 1: Mario
+Seat 2: Mario
+Seat 4: Pikachu
+Seat 5: Pikachu
+Seat 6: Pikachu
+Seat 7: Pikachu
+Seat 8: Pikachu
+Seat 9: Pikachu
+Seat 10: Pikachu
+Seat 11: Pikachu
+Seat 12: Pikachu
+Seat 13: Pikachu
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Kirby
+	>> Enter party size: 2
+	>> Enter movie name: Life
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Kirby is in first ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Kirby...
+
+
+Kirby, party of 2, has been seated in the Life Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Mario's party.
+Row 1 seat 2 used by Mario's party.
+Row 2 seat 1 used by Kirby's party.
+Row 2 seat 2 used by Pikachu's party.
+Row 3 seat 1 used by Pikachu's party.
+Row 3 seat 2 used by Pikachu's party.
+Row 4 seat 1 used by Pikachu's party.
+Row 4 seat 2 used by Pikachu's party.
+Row 5 seat 1 used by Pikachu's party.
+Row 5 seat 2 used by Pikachu's party.
+Row 6 seat 1 used by Pikachu's party.
+Row 6 seat 2 used by Pikachu's party.
+Row 7 seat 1 used by Pikachu's party.
+Row 7 seat 2 used by Kirby's party.
+Row 8 seat 1 is free.
+Row 8 seat 2 is free.
+Row 9 seat 1 is free.
+Row 9 seat 2 is free.
+Row 10 seat 1 is free.
+Row 10 seat 2 is free.
+
+Seat 1: Mario
+Seat 2: Mario
+Seat 3: Kirby
+Seat 4: Pikachu
+Seat 5: Pikachu
+Seat 6: Pikachu
+Seat 7: Pikachu
+Seat 8: Pikachu
+Seat 9: Pikachu
+Seat 10: Pikachu
+Seat 11: Pikachu
+Seat 12: Pikachu
+Seat 13: Pikachu
+Seat 14: Kirby
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 8
+The Wonderful Movie Theater, who earned $75.0, kicks out remaining customers and closes...
+Good Bye!
+
+Welcome to the Wonderful Movie Theater program!
+	Tonight's feature are:
+		"Life" and "Logan"
+
+Please specifiy the size of the Movie Theaters:
+Enter information about the Logan Movie Theater:
+		>> Enter number of rows: 0
+
+	Number must be greater than zero!
+
+		>> Enter number of rows: two
+
+	Input must be a number!
+
+		>> Enter number of rows: 1
+		>> Enter number of seats in a row: 2
+Enter information about the Life Movie Theater:
+		>> Enter number of rows: 6
+		>> Enter number of seats in a row: 3
+	>> Enter the price of a ticket: no
+
+	Input must be a number!
+
+	>> Enter the price of a ticket: -13
+
+	Number must be greater than zero!
+
+	>> Enter the price of a ticket: 0
+
+	Number must be greater than zero!
+
+	>> Enter the price of a ticket: 12.99
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: hello
+
+I'm sorry. I don't understand hello
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Mario
+	>> Enter party size: 3
+	>> Enter movie name: harry potter
+
+	That is not a valid answer!
+
+	>> Enter movie name: life
+
+	That is not a valid answer!
+
+	>> Enter movie name: Life
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Mario is in first ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 4
+
+The following customer is in the first line:
+	Customer Mario party of 3 for Life movie. 
+No customers in the second line!
+No customers in the express line!
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 is free.
+Row 1 seat 2 is free.
+Row 1 seat 3 is free.
+Row 2 seat 1 is free.
+Row 2 seat 2 is free.
+Row 2 seat 3 is free.
+Row 3 seat 1 is free.
+Row 3 seat 2 is free.
+Row 3 seat 3 is free.
+Row 4 seat 1 is free.
+Row 4 seat 2 is free.
+Row 4 seat 3 is free.
+Row 5 seat 1 is free.
+Row 5 seat 2 is free.
+Row 5 seat 3 is free.
+Row 6 seat 1 is free.
+Row 6 seat 2 is free.
+Row 6 seat 3 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 6
+
+Here's the seating chart for the Logan Movie Theater:
+
+Row 1 seat 1 is free.
+Row 1 seat 2 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Which line would you like to serve customers first? (Express/Reg1/Reg2): 1
+
+	That is not a valid answer!
+
+Which line would you like to serve customers first? (Express/Reg1/Reg2): Express
+
+Serving customer Mario...
+
+Mario, party of 3, has been seated in the Life Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Mario's party.
+Row 1 seat 2 used by Mario's party.
+Row 1 seat 3 used by Mario's party.
+Row 2 seat 1 is free.
+Row 2 seat 2 is free.
+Row 2 seat 3 is free.
+Row 3 seat 1 is free.
+Row 3 seat 2 is free.
+Row 3 seat 3 is free.
+Row 4 seat 1 is free.
+Row 4 seat 2 is free.
+Row 4 seat 3 is free.
+Row 5 seat 1 is free.
+Row 5 seat 2 is free.
+Row 5 seat 3 is free.
+Row 6 seat 1 is free.
+Row 6 seat 2 is free.
+Row 6 seat 3 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Bowser
+	>> Enter party size: 1
+	>> Enter movie name: Life
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Bowser is in first ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Bowser...
+
+Bowser, party of 1, has been seated in the Life Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Mario's party.
+Row 1 seat 2 used by Mario's party.
+Row 1 seat 3 used by Mario's party.
+Row 2 seat 1 used by Bowser's party.
+Row 2 seat 2 is free.
+Row 2 seat 3 is free.
+Row 3 seat 1 is free.
+Row 3 seat 2 is free.
+Row 3 seat 3 is free.
+Row 4 seat 1 is free.
+Row 4 seat 2 is free.
+Row 4 seat 3 is free.
+Row 5 seat 1 is free.
+Row 5 seat 2 is free.
+Row 5 seat 3 is free.
+Row 6 seat 1 is free.
+Row 6 seat 2 is free.
+Row 6 seat 3 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Bowser
+Customer Bowser is already in the theater!
+	>> Enter customer name: Pikachu
+	>> Enter party size: 3
+	>> Enter movie name: Life
+	>> Is a child 11 or younger in this party? (Y/N): Y
+
+Customer Pikachu is in express ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Pikachu...
+
+Pikachu, party of 3, has been seated in the Life Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Mario's party.
+Row 1 seat 2 used by Mario's party.
+Row 1 seat 3 used by Mario's party.
+Row 2 seat 1 used by Bowser's party.
+Row 2 seat 2 used by Pikachu's party.
+Row 2 seat 3 used by Pikachu's party.
+Row 3 seat 1 used by Pikachu's party.
+Row 3 seat 2 is free.
+Row 3 seat 3 is free.
+Row 4 seat 1 is free.
+Row 4 seat 2 is free.
+Row 4 seat 3 is free.
+Row 5 seat 1 is free.
+Row 5 seat 2 is free.
+Row 5 seat 3 is free.
+Row 6 seat 1 is free.
+Row 6 seat 2 is free.
+Row 6 seat 3 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Mewtwo
+	>> Enter party size: 2
+	>> Enter movie name: Life
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Mewtwo is in first ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Mewtwo...
+
+Mewtwo, party of 2, has been seated in the Life Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Mario's party.
+Row 1 seat 2 used by Mario's party.
+Row 1 seat 3 used by Mario's party.
+Row 2 seat 1 used by Bowser's party.
+Row 2 seat 2 used by Pikachu's party.
+Row 2 seat 3 used by Pikachu's party.
+Row 3 seat 1 used by Pikachu's party.
+Row 3 seat 2 used by Mewtwo's party.
+Row 3 seat 3 used by Mewtwo's party.
+Row 4 seat 1 is free.
+Row 4 seat 2 is free.
+Row 4 seat 3 is free.
+Row 5 seat 1 is free.
+Row 5 seat 2 is free.
+Row 5 seat 3 is free.
+Row 6 seat 1 is free.
+Row 6 seat 2 is free.
+Row 6 seat 3 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Luigi
+	>> Enter party size: 1
+	>> Enter movie name: Logan
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Luigi is in first ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Kirby
+	>> Enter party size: 1
+	>> Enter movie name: Logan
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Kirby is in second ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 4
+
+The following customer is in the first line:
+	Customer Luigi party of 1 for Logan movie. 
+The following customer is in the second line:
+	Customer Kirby party of 1 for Logan movie. 
+No customers in the express line!
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Kirby...
+
+Kirby, party of 1, has been seated in the Logan Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Mario's party.
+Row 1 seat 2 used by Mario's party.
+Row 1 seat 3 used by Mario's party.
+Row 2 seat 1 used by Bowser's party.
+Row 2 seat 2 used by Pikachu's party.
+Row 2 seat 3 used by Pikachu's party.
+Row 3 seat 1 used by Pikachu's party.
+Row 3 seat 2 used by Mewtwo's party.
+Row 3 seat 3 used by Mewtwo's party.
+Row 4 seat 1 is free.
+Row 4 seat 2 is free.
+Row 4 seat 3 is free.
+Row 5 seat 1 is free.
+Row 5 seat 2 is free.
+Row 5 seat 3 is free.
+Row 6 seat 1 is free.
+Row 6 seat 2 is free.
+Row 6 seat 3 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 6
+
+Here's the seating chart for the Logan Movie Theater:
+
+Row 1 seat 1 used by Kirby's party.
+Row 1 seat 2 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Luigi...
+
+Luigi, party of 1, has been seated in the Logan Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 6
+
+Here's the seating chart for the Logan Movie Theater:
+
+Row 1 seat 1 used by Kirby's party.
+Row 1 seat 2 used by Luigi's party.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 3
+
+	>> Enter customer name to leave Movie Theater: Kirby
+
+Customer Kirby has left the Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 6
+
+Here's the seating chart for the Logan Movie Theater:
+
+Row 1 seat 1 is free.
+Row 1 seat 2 used by Luigi's party.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Kirby
+	>> Enter party size: 1
+	>> Enter movie name: Logan
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Kirby is in first ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 4
+
+The following customer is in the first line:
+	Customer Kirby party of 1 for Logan movie. 
+No customers in the second line!
+No customers in the express line!
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Kirby...
+
+Kirby, party of 1, has been seated in the Logan Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 6
+
+Here's the seating chart for the Logan Movie Theater:
+
+Row 1 seat 1 used by Kirby's party.
+Row 1 seat 2 used by Luigi's party.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Mario's party.
+Row 1 seat 2 used by Mario's party.
+Row 1 seat 3 used by Mario's party.
+Row 2 seat 1 used by Bowser's party.
+Row 2 seat 2 used by Pikachu's party.
+Row 2 seat 3 used by Pikachu's party.
+Row 3 seat 1 used by Pikachu's party.
+Row 3 seat 2 used by Mewtwo's party.
+Row 3 seat 3 used by Mewtwo's party.
+Row 4 seat 1 is free.
+Row 4 seat 2 is free.
+Row 4 seat 3 is free.
+Row 5 seat 1 is free.
+Row 5 seat 2 is free.
+Row 5 seat 3 is free.
+Row 6 seat 1 is free.
+Row 6 seat 2 is free.
+Row 6 seat 3 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 
+
+I'm sorry. I don't understand 
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Charizard
+	>> Enter party size: 6
+	>> Enter movie name: Life
+	>> Is a child 11 or younger in this party? (Y/N): Y
+
+Customer Charizard is in express ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Charizard...
+
+Charizard, party of 6, has been seated in the Life Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Mario's party.
+Row 1 seat 2 used by Mario's party.
+Row 1 seat 3 used by Mario's party.
+Row 2 seat 1 used by Bowser's party.
+Row 2 seat 2 used by Pikachu's party.
+Row 2 seat 3 used by Pikachu's party.
+Row 3 seat 1 used by Pikachu's party.
+Row 3 seat 2 used by Mewtwo's party.
+Row 3 seat 3 used by Mewtwo's party.
+Row 4 seat 1 used by Charizard's party.
+Row 4 seat 2 used by Charizard's party.
+Row 4 seat 3 used by Charizard's party.
+Row 5 seat 1 used by Charizard's party.
+Row 5 seat 2 used by Charizard's party.
+Row 5 seat 3 used by Charizard's party.
+Row 6 seat 1 is free.
+Row 6 seat 2 is free.
+Row 6 seat 3 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 3
+
+	>> Enter customer name to leave Movie Theater: Mario
+
+Customer Mario has left the Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 is free.
+Row 1 seat 2 is free.
+Row 1 seat 3 is free.
+Row 2 seat 1 used by Bowser's party.
+Row 2 seat 2 used by Pikachu's party.
+Row 2 seat 3 used by Pikachu's party.
+Row 3 seat 1 used by Pikachu's party.
+Row 3 seat 2 used by Mewtwo's party.
+Row 3 seat 3 used by Mewtwo's party.
+Row 4 seat 1 used by Charizard's party.
+Row 4 seat 2 used by Charizard's party.
+Row 4 seat 3 used by Charizard's party.
+Row 5 seat 1 used by Charizard's party.
+Row 5 seat 2 used by Charizard's party.
+Row 5 seat 3 used by Charizard's party.
+Row 6 seat 1 is free.
+Row 6 seat 2 is free.
+Row 6 seat 3 is free.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 1
+
+	>> Enter customer name: Mario
+	>> Enter party size: 6
+	>> Enter movie name: Life
+	>> Is a child 11 or younger in this party? (Y/N): N
+
+Customer Mario is in first ticket line.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 2
+
+Serving customer Mario...
+
+Mario, party of 6, has been seated in the Life Movie Theater.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 5
+
+Here's the seating chart for the Life Movie Theater:
+
+Row 1 seat 1 used by Mario's party.
+Row 1 seat 2 used by Mario's party.
+Row 1 seat 3 used by Mario's party.
+Row 2 seat 1 used by Bowser's party.
+Row 2 seat 2 used by Pikachu's party.
+Row 2 seat 3 used by Pikachu's party.
+Row 3 seat 1 used by Pikachu's party.
+Row 3 seat 2 used by Mewtwo's party.
+Row 3 seat 3 used by Mewtwo's party.
+Row 4 seat 1 used by Charizard's party.
+Row 4 seat 2 used by Charizard's party.
+Row 4 seat 3 used by Charizard's party.
+Row 5 seat 1 used by Charizard's party.
+Row 5 seat 2 used by Charizard's party.
+Row 5 seat 3 used by Charizard's party.
+Row 6 seat 1 used by Mario's party.
+Row 6 seat 2 used by Mario's party.
+Row 6 seat 3 used by Mario's party.
+
+Select an operation from the following menu:
+	1. Customer(s) enter(s) Movie Theater.
+	2. Customer buys ticket(s).
+	3. Customer(s) leave(s) the theater.
+	4. Display info about customers waiting for tickets.
+	5. Display seating chart for Life Movie Theater.
+	6. Display seating chart for Logan Movie Theater.
+	7. Display number of tickets sold and total earnings.
+	8. End the program.
+>> Make your selection now: 8
+The Wonderful Movie Theater, who earned $311.76, kicks out remaining customers and closes...
+Good Bye!

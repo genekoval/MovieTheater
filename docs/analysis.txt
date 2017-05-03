@@ -1,0 +1,144 @@
+Eugene Koval
+Brandon Campbell
+
+Submission Date: April 27, 2017
+
+Movie Theater Project
+
+ADTs Used
+---------
+
+Array-based List:
+
+    ∙ Used to store customers, movie auditoriums, the occupied seats in the 
+      auditoriums, and the customer lines.
+    
+    ∙ List chosen for the ability to access any item in the collection.
+
+    ∙ Array-based implementation chosen for direct index access. For example,
+      to find an empty in an auditorium, we need to iterate over the collection
+      of occupied seats. Direct index access is needed so each call to get() is 
+      of time complexity O(1). A reference-based implementation would require
+      many link traversals to iterate over the list.
+
+
+Array-based Queue:
+
+    ∙ Used to store customers waiting to purchase tickets.
+
+    ∙ Due to the array-based queue's index being managed in a circular fashion,
+      customers are efficiently and easily added to the back of the line and 
+      removed from the front of the line. 
+
+    The most frequent operation is the checking if customer names entered are in 
+already in the system. This is done each time a new customer enters the theater.
+Every time they enter an existent name, they are prompted for a new one. Every 
+new attempt the customer makes requires checking if the name is already taken.
+Removing customers also requires checking the names of the customers in the
+theater. 
+    This operation is optimized through an Ascendingly Ordered List class that 
+uses an Array-Based List to store its data. The Ascendingly Ordered List adds
+new elements while keeping the list sorted at all times. Whether a customer 
+is in the line waiting to buy tickets or inside watching the movie, they are 
+always stored in the Movie Theater's Ascendingly Ordered List of Customer objects.
+    The customers are stored using their names as the search key. Searching for a
+specific item employs a binary search to find the given searh key name. The 
+Array-Based List this sorted list uses is necessary because direct index access is
+needed to efficiently access whatever index the binary search moves to next.
+
+Data Flow
+---------
+
+1. Customer(s) enter(s) Movie Theater.
+
+    WHILE customer does not have a name:
+        User is prompted for a customer name.
+        Theater runs a search on its AscendinglyOrderedList for the given name.
+        AscendinglyOrderedList performs binary search on its ArrayBasedList of 
+            customers, organized by name.
+        IF name not in list:
+            stop asking for name
+    User is prompted for their party size.
+    User is prompted for the movie titel.
+    A new Customer is constructed with the name, party size, and movie.
+    User is asked if the customer has a child 11 or younger with them.
+    Theater gets passed Customer and whether they have a child.
+    Theater compares customer Line lengths.
+    Theater iterates over ArrayBasedList of Lines to find shortest line the 
+        customer is able to be in. 
+    Customer is enqueued in the Customer Queue stored in the Line.
+    Customer is added to Theater's AscendinglyOrderedList of Customers.
+
+2. Customer buys ticket(s).
+
+    IF the next Line the Theater will serve has not been set:
+        Prommpt user for which line they would like to serve.
+    // Iterate over Theater's ArrayBasedList of Lines.
+    IF all lines are not empty:
+        Starting with the first Line, Theater checks if there is a Customer in it.
+        WHILE Lines are emtpy:
+            advance next line
+        Once Customer is found, return to Driver without dequeuing.
+        Pass Customer's movie and party size to Theater.
+        Theater uses movie to retrieve Auditorium from its AscendinglyOrderedList
+            of Auditoriums. Binary search is used in the same way Customer names 
+            are searched for.
+        Auditorium compares its remaining seats with the party size.
+        IF there are enough seats:
+            Theater dequeues Customer and passes Customer name and party size to
+                appropriate Auditorium.
+            Auditorium checks its ArrayBasedList of Seats.
+            IF Seat with position 1 does not exist:
+                Add a new Seat to the List with Customer name and position 1.
+            ELSE IF the position of the last Seat in collection is equal to the 
+                    number of occupied seats:
+                Append new Seats to the List.
+            ELSE
+                Iterate over the List of Seats checking for gaps.
+                Insert new Seats in between Seats with positions differing
+                    by more than 1.
+            Add party size to number of tickets sold.
+        ELSE 
+            Iterate through Theater's List of Auditoriums.
+            IF Auditorium with enough seats is found:
+                User prompted for whether the customer wants to see the 
+                    alternatve movie.
+                IF user complies:
+                    Customer's movie is changed to the new movie.
+                    Customer is dequeued and seated like in the above flow of steps.
+                ELSE
+                    Customer is dequeued.
+                    Theater removes Customer from its List.
+            ELSE
+                Customer is dequeued.
+                Theater removes Customer from its list.
+
+3. Customer(s) leave(s) the theater.
+
+    Prompt the user for name.
+    IF Customer with name in Theater:
+        Customer is removed from Theater.
+        Customer's name and party size is passed to their movie's Auditorium.
+        Auditorium iterates over all occupied Seats.
+        Auditorium removes each Seat that matches the given name.
+
+4. Display info about customers waiting for tickets.
+    
+    Iterate over each Line in Theater.
+    Print each Line's String representation, which contains the Line's name
+        and each Customer in line.
+
+5. Display seating chart for Life Movie Theater.
+6. Display seating chart for Logan Movie Theater.
+   
+    Theater is passed the movie name.
+    Theater calls on Auditorium with matching name to return a seating chart String.
+    Auditorium iterates over Seat List to generate a row/column based seating chart with
+        the Seat positions.
+    Seating chart is printed by Driver.
+
+7. Display number of tickets sold and total earnings.
+
+    Theater gets passed movie names. 
+    Names used to reference Auditoriums, which return their ticket counter.
+    Theater multiplies total ticket number by price of ticket.
